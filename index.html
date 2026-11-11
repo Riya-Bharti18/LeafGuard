@@ -2357,15 +2357,19 @@
       </button>
     </div>
   </aside>
+  <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="toggleSidebar()"></div>
 
   <!-- MAIN AREA -->
   <div class="dash-main">
 
     <!-- TOPBAR -->
     <header class="dash-topbar">
-      <div>
-        <div class="topbar-title" id="topbar-title">Dashboard Overview</div>
-        <div class="topbar-breadcrumb" id="topbar-breadcrumb">LeafGuard &gt; Dashboard</div>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <button class="topbar-icon-btn mobile-menu-btn" onclick="toggleSidebar()" aria-label="Toggle navigation">☰</button>
+        <div>
+          <div class="topbar-title" id="topbar-title">Dashboard Overview</div>
+          <div class="topbar-breadcrumb" id="topbar-breadcrumb">LeafGuard &gt; Dashboard</div>
+        </div>
       </div>
       <div class="topbar-right">
         <div class="topbar-search">
@@ -3171,7 +3175,20 @@
     settings: { title: 'Account Settings', breadcrumb: 'LeafGuard > Settings' }
   };
 
+  function toggleSidebar() {
+    const sb = document.getElementById('sidebar');
+    const bd = document.getElementById('sidebar-backdrop');
+    if (sb) sb.classList.toggle('open');
+    if (bd) bd.classList.toggle('show');
+  }
+
   function switchDashView(vName) {
+    if (window.innerWidth <= 768) {
+      const sb = document.getElementById('sidebar');
+      const bd = document.getElementById('sidebar-backdrop');
+      if (sb) sb.classList.remove('open');
+      if (bd) bd.classList.remove('show');
+    }
     // Nav highlight
     document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
     const item = document.getElementById('sitem-' + vName);
@@ -3574,11 +3591,39 @@
     showToast('success', '✅ Profile details updated!');
   }
 
+  const translations = {
+    en: {
+      navHome: 'Dashboard', navDetect: 'Detect Disease', navLogs: 'Prediction Logs', navModel: 'Model Info', navSettings: 'Settings',
+      welcome: 'Welcome back', summary: 'Here is your crop health summary', quickScan: 'Quick Disease Detection',
+      newScan: 'Start New Leaf Scan', langActive: 'Language: EN'
+    },
+    hi: {
+      navHome: 'डैशबोर्ड', navDetect: 'रोग पहचान', navLogs: 'स्कैन इतिहास', navModel: 'मॉडल विवरण', navSettings: 'सेटिंग्स',
+      welcome: 'स्वागत है', summary: 'यह आपकी फसल स्वास्थ्य का सारांश है', quickScan: 'त्वरित रोग पहचान',
+      newScan: 'नई पत्ती स्कैन करें', langActive: 'भाषा: हिन्दी'
+    },
+    bn: {
+      navHome: 'ড্যাশবোর্ড', navDetect: 'রোগ শনাক্তকরণ', navLogs: 'স্ক্যান ইতিহাস', navModel: 'মডেল বিবরণী', navSettings: 'সেটিংস',
+      welcome: 'স্বাগতম', summary: 'এটি আপনার ফসলের স্বাস্থ্যের সংক্ষিপ্ত বিবরণ', quickScan: 'দ্রুত রোগ নির্ণয়',
+      newScan: 'নতুন পাতা স্ক্যান করুন', langActive: 'ভাষা: বাংলা'
+    }
+  };
+
   function selectLang(code) {
     ['en','hi','bn'].forEach(c => {
       document.getElementById('lopt-' + c).classList.toggle('sel', c === code);
     });
+    const t = translations[code] || translations.en;
     const names = { en: 'English', hi: 'हिन्दी (Hindi)', bn: 'বাংলা (Bengali)' };
+    
+    // Update sidebar items
+    const sHome = document.querySelector('#sitem-home span:last-child'); if (sHome) sHome.textContent = t.navHome;
+    const sDetect = document.querySelector('#sitem-detect span:last-child'); if (sDetect) sDetect.textContent = t.navDetect;
+    const sLogs = document.querySelector('#sitem-logs span:nth-child(2)'); if (sLogs) sLogs.textContent = t.navLogs;
+    const sModel = document.querySelector('#sitem-model span:last-child'); if (sModel) sModel.textContent = t.navModel;
+    const sSettings = document.querySelector('#sitem-settings span:last-child'); if (sSettings) sSettings.textContent = t.navSettings;
+    const sLang = document.getElementById('sidebar-lang-text'); if (sLang) sLang.textContent = t.langActive;
+
     showToast('success', '🌐 Interface language set to ' + names[code]);
   }
 
