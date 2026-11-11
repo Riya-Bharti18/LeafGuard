@@ -28,3 +28,4 @@ LeafGuard is an AI-powered crop health intelligence and early-screening platform
 ## 🏃 Getting Started
 
 Simply open `index.html` in any modern web browser — no dependencies or build steps required!
+
