@@ -1,0 +1,3659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LeafGuard – AI Plant Health Intelligence</title>
+  <style>
+    /* ===== CSS VARIABLES ===== */
+    :root {
+      --green-900: #14532d;
+      --green-800: #166534;
+      --green-700: #15803d;
+      --green-600: #16a34a;
+      --green-500: #22c55e;
+      --green-400: #4ade80;
+      --green-300: #86efac;
+      --green-100: #dcfce7;
+      --green-50:  #f0fdf4;
+      --amber-500: #f59e0b;
+      --amber-100: #fef3c7;
+      --red-500:   #ef4444;
+      --red-100:   #fee2e2;
+      --slate-900: #0f172a;
+      --slate-800: #1e293b;
+      --slate-700: #334155;
+      --slate-600: #475569;
+      --slate-400: #94a3b8;
+      --slate-200: #e2e8f0;
+      --slate-100: #f1f5f9;
+      --white:     #ffffff;
+      --radius-sm: 6px;
+      --radius:    12px;
+      --radius-lg: 20px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+      --shadow:    0 4px 16px rgba(0,0,0,.10);
+      --shadow-lg: 0 10px 40px rgba(0,0,0,.14);
+      --transition: .2s ease;
+    }
+
+    /* ===== RESET & BASE ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--slate-100);
+      color: var(--slate-800);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    a { color: inherit; text-decoration: none; }
+    button { cursor: pointer; border: none; outline: none; font-family: inherit; }
+    input, select, textarea { font-family: inherit; }
+    img { max-width: 100%; display: block; }
+
+    /* ===== PAGE SYSTEM ===== */
+    .page { display: none; min-height: 100vh; }
+    .page.active { display: block; }
+
+    /* ===== ---- LANDING PAGE ---- ===== */
+    #page-landing {
+      background: linear-gradient(135deg, var(--green-900) 0%, var(--green-700) 50%, var(--green-500) 100%);
+      display: none;
+      flex-direction: column;
+    }
+    #page-landing.active { display: flex; }
+
+    /* NAV */
+    .landing-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 48px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(21,128,61,.7);
+      backdrop-filter: blur(12px);
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--white);
+      letter-spacing: -.5px;
+    }
+    .logo-leaf {
+      width: 36px; height: 36px;
+      background: var(--green-400);
+      border-radius: 50% 50% 50% 0;
+      transform: rotate(-45deg);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .logo-leaf span { transform: rotate(45deg); display: block; }
+    .nav-links { display: flex; gap: 8px; align-items: center; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 10px 22px; border-radius: var(--radius-sm);
+      font-size: .9rem; font-weight: 600;
+      transition: all var(--transition);
+      white-space: nowrap;
+    }
+    .btn-ghost {
+      background: transparent;
+      color: var(--white);
+      border: 2px solid rgba(255,255,255,.4);
+    }
+    .btn-ghost:hover { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.8); }
+    .btn-primary {
+      background: var(--white);
+      color: var(--green-800);
+      border: 2px solid transparent;
+      box-shadow: var(--shadow);
+    }
+    .btn-primary:hover { background: var(--green-50); transform: translateY(-1px); box-shadow: var(--shadow-lg); }
+    .btn-green {
+      background: var(--green-600);
+      color: var(--white);
+      border: 2px solid transparent;
+      box-shadow: var(--shadow);
+    }
+    .btn-green:hover { background: var(--green-700); transform: translateY(-1px); }
+    .btn-lg { padding: 14px 32px; font-size: 1rem; border-radius: var(--radius); }
+    .btn-sm { padding: 7px 16px; font-size: .82rem; }
+
+    /* HERO */
+    .hero {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 80px 24px 60px;
+      gap: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Ccircle cx='30' cy='30' r='1.5' fill='rgba(255,255,255,.08)'/%3E%3C/svg%3E");
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(255,255,255,.15);
+      border: 1px solid rgba(255,255,255,.3);
+      border-radius: 999px;
+      padding: 6px 16px;
+      font-size: .82rem; font-weight: 600;
+      color: var(--green-100);
+      letter-spacing: .5px;
+      text-transform: uppercase;
+      position: relative;
+      z-index: 1;
+    }
+    .hero-badge .dot {
+      width: 8px; height: 8px;
+      background: var(--green-400);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: .6; transform: scale(1.3); }
+    }
+    .hero h1 {
+      font-size: clamp(2.2rem, 6vw, 4rem);
+      font-weight: 900;
+      color: var(--white);
+      line-height: 1.1;
+      letter-spacing: -1px;
+      position: relative; z-index: 1;
+      max-width: 760px;
+    }
+    .hero h1 span { color: var(--green-300); }
+    .hero p {
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      color: rgba(255,255,255,.85);
+      max-width: 560px;
+      position: relative; z-index: 1;
+    }
+    .hero-cta {
+      display: flex; gap: 14px; flex-wrap: wrap; justify-content: center;
+      position: relative; z-index: 1;
+    }
+    .hero-stats {
+      display: flex; gap: 40px; flex-wrap: wrap; justify-content: center;
+      margin-top: 20px;
+      position: relative; z-index: 1;
+    }
+    .stat { text-align: center; }
+    .stat-num { font-size: 1.8rem; font-weight: 800; color: var(--white); }
+    .stat-label { font-size: .78rem; color: rgba(255,255,255,.65); text-transform: uppercase; letter-spacing: .5px; }
+
+    /* FLOATING CARDS */
+    .hero-visual {
+      position: relative; z-index: 1;
+      margin-top: 10px;
+      width: 100%; max-width: 680px;
+    }
+    .hero-card {
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.2);
+      border-radius: var(--radius-lg);
+      backdrop-filter: blur(16px);
+      padding: 20px 28px;
+      display: flex; align-items: center; gap: 16px;
+      text-align: left;
+    }
+    .hero-card-icon {
+      width: 52px; height: 52px;
+      background: var(--green-400);
+      border-radius: var(--radius);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; flex-shrink: 0;
+    }
+    .hero-card-title { font-weight: 700; color: var(--white); font-size: 1rem; }
+    .hero-card-sub { font-size: .84rem; color: rgba(255,255,255,.75); margin-top: 2px; }
+    .hero-card-badge {
+      margin-left: auto;
+      background: var(--green-500);
+      color: var(--white);
+      border-radius: 999px;
+      padding: 4px 12px;
+      font-size: .78rem; font-weight: 700;
+      flex-shrink: 0;
+    }
+    .hero-card-badge.amber { background: var(--amber-500); }
+
+    /* FEATURES SECTION */
+    .section {
+      padding: 80px 24px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .section-tag {
+      display: inline-block;
+      background: var(--green-100);
+      color: var(--green-700);
+      border-radius: 999px;
+      padding: 4px 14px;
+      font-size: .78rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .5px;
+      margin-bottom: 12px;
+    }
+    .section h2 {
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      font-weight: 800;
+      color: var(--slate-900);
+      letter-spacing: -.5px;
+      margin-bottom: 10px;
+    }
+    .section > p {
+      color: var(--slate-600);
+      font-size: 1.05rem;
+      max-width: 560px;
+      margin-bottom: 48px;
+    }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 24px;
+    }
+    .feature-card {
+      background: var(--white);
+      border: 1px solid var(--slate-200);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      transition: all var(--transition);
+    }
+    .feature-card:hover {
+      border-color: var(--green-400);
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-3px);
+    }
+    .feature-icon {
+      width: 52px; height: 52px;
+      border-radius: var(--radius);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px;
+      margin-bottom: 16px;
+    }
+    .feature-icon.green { background: var(--green-100); }
+    .feature-icon.amber { background: var(--amber-100); }
+    .feature-icon.red   { background: var(--red-100); }
+    .feature-icon.blue  { background: #dbeafe; }
+    .feature-card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 8px; color: var(--slate-900); }
+    .feature-card p { font-size: .9rem; color: var(--slate-600); line-height: 1.6; }
+
+    /* HOW IT WORKS */
+    .landing-alt { background: var(--green-50); }
+    .steps {
+      display: flex;
+      gap: 0;
+      position: relative;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .steps::before {
+      content: '';
+      position: absolute;
+      top: 36px; left: 10%; right: 10%;
+      height: 2px;
+      background: linear-gradient(90deg, var(--green-300), var(--green-500));
+      z-index: 0;
+    }
+    .step {
+      flex: 1; min-width: 180px; max-width: 220px;
+      text-align: center;
+      padding: 0 16px;
+      position: relative; z-index: 1;
+    }
+    .step-num {
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--green-500), var(--green-700));
+      color: var(--white);
+      font-size: 1.4rem; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 16px;
+      box-shadow: 0 4px 16px rgba(22,163,74,.35);
+    }
+    .step h4 { font-size: .95rem; font-weight: 700; margin-bottom: 6px; color: var(--slate-900); }
+    .step p { font-size: .84rem; color: var(--slate-600); }
+
+    /* TESTIMONIALS */
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .testimonial {
+      background: var(--white);
+      border: 1px solid var(--slate-200);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+    }
+    .testimonial-stars { color: var(--amber-500); font-size: 1.1rem; margin-bottom: 12px; }
+    .testimonial p { font-size: .92rem; color: var(--slate-700); font-style: italic; margin-bottom: 16px; line-height: 1.65; }
+    .testimonial-author { display: flex; align-items: center; gap: 10px; }
+    .avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; font-weight: 700; color: var(--white); flex-shrink: 0;
+    }
+    .author-name { font-size: .9rem; font-weight: 700; color: var(--slate-900); }
+    .author-role { font-size: .78rem; color: var(--slate-500); }
+
+    /* CTA BANNER */
+    .cta-banner {
+      background: linear-gradient(135deg, var(--green-800), var(--green-600));
+      color: var(--white);
+      text-align: center;
+      padding: 80px 24px;
+    }
+    .cta-banner h2 { font-size: clamp(1.6rem, 4vw, 2.4rem); font-weight: 800; margin-bottom: 12px; }
+    .cta-banner p { font-size: 1.05rem; color: rgba(255,255,255,.8); margin-bottom: 32px; }
+
+    /* FOOTER */
+    .landing-footer {
+      background: var(--slate-900);
+      color: var(--slate-400);
+      padding: 48px 48px 28px;
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 40px;
+      margin-bottom: 40px;
+    }
+    .footer-brand .logo { margin-bottom: 12px; }
+    .footer-brand p { font-size: .88rem; line-height: 1.65; }
+    .footer-col h5 { font-size: .82rem; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--white); margin-bottom: 14px; }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .footer-col ul li { font-size: .88rem; cursor: pointer; transition: color var(--transition); }
+    .footer-col ul li:hover { color: var(--green-400); }
+    .footer-bottom { border-top: 1px solid var(--slate-700); padding-top: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+    .footer-bottom p { font-size: .82rem; }
+    .disclaimer {
+      background: var(--amber-100);
+      border-left: 4px solid var(--amber-500);
+      border-radius: var(--radius-sm);
+      padding: 12px 16px;
+      font-size: .82rem;
+      color: #78350f;
+      max-width: 480px;
+    }
+
+    /* ===== ---- AUTH PAGE ---- ===== */
+    #page-auth {
+      display: none;
+      min-height: 100vh;
+    }
+    #page-auth.active { display: grid; grid-template-columns: 1fr 1fr; }
+
+    .auth-left {
+      background: linear-gradient(145deg, var(--green-900), var(--green-700));
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 60px 48px;
+      position: relative;
+      overflow: hidden;
+    }
+    .auth-left::after {
+      content: '';
+      position: absolute;
+      bottom: -80px; right: -80px;
+      width: 320px; height: 320px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.04);
+    }
+    .auth-left-content { position: relative; z-index: 1; text-align: center; }
+    .auth-left .logo { justify-content: center; font-size: 1.8rem; margin-bottom: 32px; }
+    .auth-left h2 { font-size: 1.9rem; font-weight: 800; color: var(--white); margin-bottom: 12px; line-height: 1.2; }
+    .auth-left p { color: rgba(255,255,255,.75); font-size: 1rem; margin-bottom: 36px; }
+    .auth-features { display: flex; flex-direction: column; gap: 14px; text-align: left; }
+    .auth-feature {
+      display: flex; align-items: flex-start; gap: 12px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+    }
+    .auth-feature-icon { font-size: 1.3rem; flex-shrink: 0; margin-top: 1px; }
+    .auth-feature-text { font-size: .88rem; color: rgba(255,255,255,.85); font-weight: 500; }
+    .auth-feature-title { font-weight: 700; color: var(--white); font-size: .92rem; display: block; margin-bottom: 2px; }
+
+    .auth-right {
+      background: var(--white);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 48px 56px;
+    }
+    .auth-box { width: 100%; max-width: 420px; }
+    .auth-tabs {
+      display: flex;
+      border-radius: var(--radius);
+      background: var(--slate-100);
+      padding: 4px;
+      margin-bottom: 32px;
+    }
+    .auth-tab {
+      flex: 1; padding: 10px; text-align: center;
+      border-radius: var(--radius-sm);
+      font-size: .92rem; font-weight: 600;
+      color: var(--slate-500);
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    .auth-tab.active {
+      background: var(--white);
+      color: var(--green-700);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .auth-form { display: none; }
+    .auth-form.active { display: block; }
+
+    .auth-form h3 { font-size: 1.5rem; font-weight: 800; color: var(--slate-900); margin-bottom: 6px; }
+    .auth-form .sub { font-size: .9rem; color: var(--slate-500); margin-bottom: 28px; }
+
+    .form-group { margin-bottom: 18px; }
+    .form-group label { display: block; font-size: .84rem; font-weight: 600; color: var(--slate-700); margin-bottom: 6px; }
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1.5px solid var(--slate-200);
+      border-radius: var(--radius-sm);
+      font-size: .95rem;
+      color: var(--slate-800);
+      background: var(--white);
+      transition: border-color var(--transition), box-shadow var(--transition);
+      outline: none;
+    }
+    .form-group input:focus, .form-group select:focus {
+      border-color: var(--green-500);
+      box-shadow: 0 0 0 3px rgba(34,197,94,.12);
+    }
+    .form-group input.error { border-color: var(--red-500); }
+    .field-error { font-size: .78rem; color: var(--red-500); margin-top: 4px; display: none; }
+    .field-error.show { display: block; }
+
+    .input-with-icon { position: relative; }
+    .input-with-icon input { padding-left: 40px; }
+    .input-icon {
+      position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+      font-size: 1rem; color: var(--slate-400);
+    }
+    .password-toggle {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      cursor: pointer; color: var(--slate-400); font-size: 1rem;
+      transition: color var(--transition); background: none;
+    }
+    .password-toggle:hover { color: var(--green-600); }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+    .remember-row {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 20px;
+    }
+    .checkbox-label {
+      display: flex; align-items: center; gap: 8px;
+      font-size: .86rem; color: var(--slate-600); cursor: pointer;
+    }
+    .checkbox-label input[type=checkbox] {
+      width: 16px; height: 16px; accent-color: var(--green-600);
+    }
+    .forgot-link { font-size: .86rem; color: var(--green-600); font-weight: 600; cursor: pointer; }
+    .forgot-link:hover { color: var(--green-800); }
+
+    .btn-auth {
+      width: 100%; padding: 13px;
+      background: linear-gradient(135deg, var(--green-600), var(--green-700));
+      color: var(--white);
+      border-radius: var(--radius-sm);
+      font-size: 1rem; font-weight: 700;
+      border: none; cursor: pointer;
+      transition: all var(--transition);
+      box-shadow: 0 2px 10px rgba(22,163,74,.35);
+      margin-bottom: 20px;
+    }
+    .btn-auth:hover { background: linear-gradient(135deg, var(--green-700), var(--green-800)); transform: translateY(-1px); }
+    .btn-auth:active { transform: translateY(0); }
+    .btn-auth:disabled { opacity: .65; cursor: not-allowed; transform: none; }
+
+    .divider {
+      display: flex; align-items: center; gap: 12px;
+      color: var(--slate-400); font-size: .82rem; margin-bottom: 16px;
+    }
+    .divider::before, .divider::after {
+      content: ''; flex: 1; height: 1px; background: var(--slate-200);
+    }
+
+    .btn-social {
+      width: 100%; padding: 11px;
+      border: 1.5px solid var(--slate-200);
+      border-radius: var(--radius-sm);
+      background: var(--white);
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      font-size: .9rem; font-weight: 600; color: var(--slate-700);
+      cursor: pointer; margin-bottom: 10px;
+      transition: all var(--transition);
+    }
+    .btn-social:hover { border-color: var(--slate-400); background: var(--slate-50); }
+
+    .terms-text { font-size: .78rem; color: var(--slate-500); text-align: center; margin-top: 4px; }
+    .terms-text a { color: var(--green-600); font-weight: 600; cursor: pointer; }
+
+    .alert {
+      border-radius: var(--radius-sm);
+      padding: 12px 16px;
+      font-size: .88rem;
+      margin-bottom: 16px;
+      display: none;
+    }
+    .alert.show { display: flex; align-items: center; gap: 10px; }
+    .alert-success { background: var(--green-100); color: var(--green-800); border: 1px solid var(--green-300); }
+    .alert-error   { background: var(--red-100);   color: var(--red-500);   border: 1px solid #fca5a5; }
+
+    /* Password strength */
+    .password-strength { margin-top: 8px; }
+    .strength-bar {
+      height: 4px; border-radius: 2px;
+      background: var(--slate-200);
+      overflow: hidden; margin-bottom: 4px;
+    }
+    .strength-fill { height: 100%; border-radius: 2px; transition: all .3s; width: 0; }
+    .strength-text { font-size: .75rem; color: var(--slate-500); }
+
+    /* Progress spinner */
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,.3);
+      border-top-color: var(--white);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      display: none;
+    }
+    .spinner.show { display: inline-block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ===== ---- DASHBOARD PREVIEW PAGE ---- ===== */
+    #page-dashboard {
+      display: none;
+      flex-direction: column;
+    }
+    #page-dashboard.active { display: flex; }
+
+    .app-nav {
+      background: var(--white);
+      border-bottom: 1px solid var(--slate-200);
+      display: flex; align-items: center;
+      padding: 0 32px;
+      height: 64px;
+      position: sticky; top: 0; z-index: 100;
+      box-shadow: var(--shadow-sm);
+    }
+    .app-nav .logo { font-size: 1.3rem; }
+    .app-nav .logo-leaf { width: 30px; height: 30px; font-size: 14px; }
+    .nav-menu {
+      display: flex; gap: 2px;
+      margin-left: 32px; flex: 1;
+    }
+    .nav-item {
+      padding: 6px 14px; border-radius: var(--radius-sm);
+      font-size: .88rem; font-weight: 600;
+      color: var(--slate-500); cursor: pointer;
+      transition: all var(--transition);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .nav-item:hover { color: var(--green-700); background: var(--green-50); }
+    .nav-item.active { color: var(--green-700); background: var(--green-50); }
+    .nav-actions { display: flex; align-items: center; gap: 12px; }
+    .user-menu {
+      display: flex; align-items: center; gap: 10px;
+      padding: 6px 12px; border-radius: var(--radius);
+      cursor: pointer; transition: background var(--transition);
+    }
+    .user-menu:hover { background: var(--slate-100); }
+    .user-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--green-500), var(--green-700));
+      display: flex; align-items: center; justify-content: center;
+      font-size: .9rem; font-weight: 700; color: var(--white);
+    }
+    .user-name { font-size: .88rem; font-weight: 600; color: var(--slate-700); }
+    .user-role { font-size: .72rem; color: var(--slate-400); }
+
+    .dashboard-content {
+      flex: 1;
+      padding: 32px;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    .dashboard-header { margin-bottom: 28px; }
+    .dashboard-header h1 { font-size: 1.6rem; font-weight: 800; color: var(--slate-900); }
+    .dashboard-header p { color: var(--slate-500); font-size: .92rem; margin-top: 4px; }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    .kpi-card {
+      background: var(--white);
+      border: 1px solid var(--slate-200);
+      border-radius: var(--radius);
+      padding: 20px 22px;
+      display: flex; align-items: center; gap: 16px;
+    }
+    .kpi-icon {
+      width: 48px; height: 48px; border-radius: var(--radius);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; flex-shrink: 0;
+    }
+    .kpi-num { font-size: 1.7rem; font-weight: 800; color: var(--slate-900); line-height: 1; }
+    .kpi-label { font-size: .78rem; color: var(--slate-500); margin-top: 3px; }
+    .kpi-change { font-size: .78rem; font-weight: 600; margin-top: 2px; }
+    .kpi-change.up { color: var(--green-600); }
+    .kpi-change.down { color: var(--red-500); }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+    }
+    .card {
+      background: var(--white);
+      border: 1px solid var(--slate-200);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+    }
+    .card-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 20px;
+    }
+    .card-title { font-size: 1rem; font-weight: 700; color: var(--slate-900); }
+    .card-action { font-size: .82rem; color: var(--green-600); font-weight: 600; cursor: pointer; }
+    .card-action:hover { color: var(--green-800); }
+
+    .prediction-item {
+      display: flex; align-items: center; gap: 14px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--slate-100);
+    }
+    .prediction-item:last-child { border-bottom: none; }
+    .pred-thumb {
+      width: 48px; height: 48px; border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; flex-shrink: 0;
+      background: var(--green-50);
+    }
+    .pred-info { flex: 1; }
+    .pred-crop { font-size: .9rem; font-weight: 700; color: var(--slate-800); }
+    .pred-disease { font-size: .8rem; color: var(--slate-500); margin-top: 1px; }
+    .pred-time { font-size: .75rem; color: var(--slate-400); margin-top: 1px; }
+    .pred-badge {
+      border-radius: 999px; padding: 3px 10px;
+      font-size: .75rem; font-weight: 700; flex-shrink: 0;
+    }
+    .pred-badge.healthy { background: var(--green-100); color: var(--green-700); }
+    .pred-badge.disease { background: var(--red-100);   color: var(--red-500); }
+    .pred-badge.uncertain { background: var(--amber-100); color: #92400e; }
+    .pred-conf { font-size: .78rem; color: var(--slate-500); flex-shrink: 0; min-width: 46px; text-align: right; }
+
+    .upload-zone {
+      border: 2px dashed var(--green-300);
+      border-radius: var(--radius-lg);
+      padding: 36px;
+      text-align: center;
+      cursor: pointer;
+      transition: all var(--transition);
+      background: var(--green-50);
+    }
+    .upload-zone:hover { border-color: var(--green-500); background: var(--green-100); }
+    .upload-icon { font-size: 2.5rem; margin-bottom: 10px; }
+    .upload-text { font-size: .92rem; font-weight: 600; color: var(--green-700); }
+    .upload-sub { font-size: .8rem; color: var(--slate-500); margin-top: 4px; }
+
+    /* Mini bar chart */
+    .chart-bars { display: flex; align-items: flex-end; gap: 8px; height: 80px; margin-bottom: 10px; }
+    .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .bar { width: 100%; border-radius: 3px 3px 0 0; background: var(--green-500); transition: height .5s; }
+    .bar.disease { background: var(--red-500); }
+    .bar.uncertain { background: var(--amber-500); }
+    .bar-label { font-size: .62rem; color: var(--slate-500); text-align: center; }
+
+    .signout-btn {
+      display: flex; align-items: center; gap: 6px;
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      font-size: .86rem; font-weight: 600;
+      color: var(--red-500);
+      background: var(--red-100);
+      border: none; cursor: pointer;
+      transition: all var(--transition);
+    }
+    .signout-btn:hover { background: #fca5a5; }
+
+    /* ===== DASHBOARD SUBVIEWS ===== */
+    .dash-view { display: none; }
+    .dash-view.active { display: block; }
+
+    /* ===== DETECT DISEASE PAGE ===== */
+    .detect-wrap { max-width: 760px; margin: 0 auto; }
+    .detect-steps-bar {
+      display: flex; align-items: center; gap: 0;
+      margin-bottom: 36px;
+    }
+    .detect-step-item {
+      display: flex; align-items: center; gap: 8px;
+      font-size: .82rem; font-weight: 600;
+      color: var(--slate-400);
+      flex: 1;
+    }
+    .detect-step-item.active { color: var(--green-700); }
+    .detect-step-item.done   { color: var(--green-500); }
+    .detect-step-num {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--slate-200); color: var(--slate-500);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .78rem; font-weight: 800; flex-shrink: 0;
+    }
+    .detect-step-item.active .detect-step-num { background: var(--green-600); color: var(--white); }
+    .detect-step-item.done   .detect-step-num { background: var(--green-500); color: var(--white); }
+    .detect-step-line {
+      flex: 1; height: 2px; background: var(--slate-200); margin: 0 6px;
+    }
+    .detect-step-line.done { background: var(--green-400); }
+
+    /* Upload zone */
+    .big-upload-zone {
+      border: 2.5px dashed var(--green-300);
+      border-radius: var(--radius-lg);
+      background: var(--green-50);
+      padding: 56px 32px;
+      text-align: center;
+      cursor: pointer;
+      transition: all var(--transition);
+      position: relative;
+    }
+    .big-upload-zone:hover, .big-upload-zone.drag-over {
+      border-color: var(--green-500);
+      background: var(--green-100);
+    }
+    .big-upload-zone input[type=file] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+    }
+    .upload-big-icon { font-size: 3.5rem; margin-bottom: 14px; }
+    .upload-big-title { font-size: 1.1rem; font-weight: 700; color: var(--green-800); margin-bottom: 6px; }
+    .upload-big-sub { font-size: .88rem; color: var(--slate-500); }
+    .upload-tips {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 28px;
+    }
+    .upload-tip {
+      background: var(--white); border: 1px solid var(--slate-200);
+      border-radius: var(--radius); padding: 12px 14px;
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: .82rem; color: var(--slate-600);
+    }
+    .upload-tip-icon { font-size: 1.1rem; flex-shrink: 0; }
+
+    /* Preview state */
+    .preview-box {
+      background: var(--white); border: 1px solid var(--slate-200);
+      border-radius: var(--radius-lg); padding: 24px;
+    }
+    .preview-img-wrap {
+      position: relative; border-radius: var(--radius); overflow: hidden;
+      background: var(--slate-100); margin-bottom: 20px;
+      display: flex; align-items: center; justify-content: center;
+      min-height: 240px;
+    }
+    .preview-img-wrap img { max-height: 320px; object-fit: contain; border-radius: var(--radius); }
+    .preview-img-placeholder {
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+      color: var(--slate-400); font-size: .9rem; padding: 48px;
+    }
+    .preview-img-placeholder span { font-size: 3rem; }
+    .preview-actions { display: flex; gap: 12px; }
+    .btn-analyze {
+      flex: 1; padding: 13px; border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, var(--green-600), var(--green-700));
+      color: var(--white); font-size: 1rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      cursor: pointer; border: none; transition: all var(--transition);
+      box-shadow: 0 2px 10px rgba(22,163,74,.35);
+    }
+    .btn-analyze:hover { background: linear-gradient(135deg, var(--green-700), var(--green-800)); transform: translateY(-1px); }
+    .btn-reupload {
+      padding: 13px 20px; border-radius: var(--radius-sm);
+      border: 1.5px solid var(--slate-200); background: var(--white);
+      color: var(--slate-600); font-size: .95rem; font-weight: 600;
+      cursor: pointer; transition: all var(--transition);
+    }
+    .btn-reupload:hover { border-color: var(--slate-400); background: var(--slate-50); }
+
+    /* Analyzing state */
+    .analyzing-box {
+      background: var(--white); border: 1px solid var(--slate-200);
+      border-radius: var(--radius-lg); padding: 48px 32px;
+      text-align: center;
+    }
+    .analyzing-spinner {
+      width: 72px; height: 72px;
+      border: 5px solid var(--green-100);
+      border-top-color: var(--green-500);
+      border-radius: 50%;
+      animation: spin .9s linear infinite;
+      margin: 0 auto 24px;
+    }
+    .analyzing-title { font-size: 1.2rem; font-weight: 700; color: var(--slate-900); margin-bottom: 8px; }
+    .analyzing-steps { display: flex; flex-direction: column; gap: 8px; margin-top: 24px; text-align: left; max-width: 320px; margin-left: auto; margin-right: auto; }
+    .analyzing-step {
+      display: flex; align-items: center; gap: 10px;
+      font-size: .85rem; color: var(--slate-500);
+      padding: 8px 12px; border-radius: var(--radius-sm);
+      background: var(--slate-50);
+    }
+    .analyzing-step.done { color: var(--green-700); background: var(--green-50); }
+    .analyzing-step.active { color: var(--slate-800); background: var(--amber-100); }
+    .step-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--slate-300); flex-shrink: 0;
+    }
+    .analyzing-step.done .step-dot { background: var(--green-500); }
+    .analyzing-step.active .step-dot { background: var(--amber-500); animation: pulse 1s infinite; }
+
+    /* Result state */
+    .result-box { display: flex; flex-direction: column; gap: 20px; }
+    .result-header-card {
+      background: var(--white); border: 1px solid var(--slate-200);
+      border-radius: var(--radius-lg); padding: 24px;
+      display: flex; gap: 20px; align-items: flex-start;
+    }
+    .result-leaf-img {
+      width: 120px; height: 120px; border-radius: var(--radius);
+      object-fit: cover; flex-shrink: 0; background: var(--green-50);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 3rem; border: 2px solid var(--slate-200);
+    }
+    .result-primary { flex: 1; }
+    .result-label { font-size: 1.3rem; font-weight: 800; color: var(--slate-900); margin-bottom: 4px; }
+    .result-crop-tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--green-100); color: var(--green-700);
+      border-radius: 999px; padding: 4px 12px;
+      font-size: .78rem; font-weight: 700; margin-bottom: 10px;
+    }
+    .conf-row { display: flex; align-items: center; gap: 10px; }
+    .conf-num { font-size: 1.5rem; font-weight: 800; color: var(--green-700); }
+    .conf-bar-wrap { flex: 1; }
+    .conf-bar-bg { height: 8px; border-radius: 4px; background: var(--slate-200); overflow: hidden; }
+    .conf-bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--green-400), var(--green-600)); }
+    .conf-label { font-size: .78rem; color: var(--slate-500); margin-top: 3px; }
+    .result-timestamp { font-size: .78rem; color: var(--slate-400); margin-top: 8px; }
+
+    .result-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .result-card {
+      background: var(--white); border: 1px solid var(--slate-200);
+      border-radius: var(--radius-lg); padding: 20px;
+    }
+    .result-card-title {
+      font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .5px;
+      color: var(--slate-500); margin-bottom: 10px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .result-card p { font-size: .88rem; color: var(--slate-700); line-height: 1.65; }
+    .remedy-steps { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .remedy-step {
+      display: flex; gap: 10px; align-items: flex-start;
+      font-size: .86rem; color: var(--slate-700);
+      padding: 8px; border-radius: var(--radius-sm);
+      background: var(--green-50);
+    }
+    .remedy-num {
+      width: 22px; height: 22px; border-radius: 50%;
+      background: var(--green-500); color: var(--white);
+      font-size: .7rem; font-weight: 800;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .source-link { font-size: .75rem; color: var(--green-600); font-weight: 600; cursor: pointer; margin-top: 10px; }
+
+    /* Gradcam heatmap (CSS canvas simulation) */
+    .gradcam-wrap {
+      position: relative; border-radius: var(--radius); overflow: hidden;
+      background: var(--slate-100);
+    }
+    .gradcam-img-bg {
+      width: 100%; height: 160px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 4rem; background: var(--green-50);
+      position: relative;
+    }
+    .gradcam-overlay {
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 55% 45%, rgba(239,68,68,.5) 0%, rgba(245,158,11,.35) 35%, transparent 70%);
+      mix-blend-mode: multiply;
+      border-radius: var(--radius);
+    }
+    .gradcam-label {
+      font-size: .72rem; color: var(--slate-500); margin-top: 6px; text-align: center; font-style: italic;
+    }
+    .uncertainty-banner {
+      background: var(--amber-100); border: 1px solid #fcd34d;
+      border-radius: var(--radius); padding: 14px 16px;
+      font-size: .86rem; color: #78350f;
+      display: flex; gap: 10px; align-items: flex-start;
+    }
+
+    /* ===== PREDICTION LOGS PAGE ===== */
+    .logs-filters {
+      background: var(--white); border: 1px solid var(--slate-200);
+      border-radius: var(--radius-lg); padding: 20px 24px;
+      margin-bottom: 20px;
+      display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end;
+    }
+    .filter-group { display: flex; flex-direction: column; gap: 4px; }
+    .filter-group label { font-size: .78rem; font-weight: 600; color: var(--slate-500); text-transform: uppercase; letter-spacing: .5px; }
+    .filter-group select, .filter-group input {
+      padding: 8px 12px; border: 1.5px solid var(--slate-200);
+      border-radius: var(--radius-sm); font-size: .88rem;
+      color: var(--slate-800); background: var(--white); outline: none;
+      transition: border-color var(--transition);
+      min-width: 140px;
+    }
+    .filter-group select:focus, .filter-group input:focus { border-color: var(--green-500); }
+    .btn-filter-reset {
+      padding: 8px 16px; border-radius: var(--radius-sm);
+      border: 1.5px solid var(--slate-200); background: var(--white);
+      font-size: .86rem; font-weight: 600; color: var(--slate-500);
+      cursor: pointer; transition: all var(--transition); align-self: flex-end;
+    }
+    .btn-filter-reset:hover { border-color: var(--red-500); color: var(--red-500); }
+
+    .logs-table-wrap {
+      background: var(--white); border: 1px solid var(--slate-200);
+      border-radius: var(--radius-lg); overflow: hidden;
+    }
+    .logs-table { width: 100%; border-collapse: collapse; }
+    .logs-table th {
+      padding: 12px 16px; text-align: left;
+      font-size: .75rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .5px; color: var(--slate-500);
+      background: var(--slate-50); border-bottom: 1px solid var(--slate-200);
+    }
+    .logs-table td {
+      padding: 13px 16px; border-bottom: 1px solid var(--slate-100);
+      font-size: .88rem; color: var(--slate-700);
+      vertical-align: middle;
+    }
+    .logs-table tr:last-child td { border-bottom: none; }
+    .logs-table tr:hover td { background: var(--slate-50); }
+    .log-thumb {
+      width: 36px; height: 36px; border-radius: var(--radius-sm);
+      background: var(--green-50); display: flex; align-items: center;
+      justify-content: center; font-size: 1.2rem; flex-shrink: 0;
+    }
+    .log-crop { font-weight: 700; color: var(--slate-900); }
+    .log-disease { font-size: .78rem; color: var(--slate-500); }
+    .conf-pill {
+      display: inline-block; padding: 2px 10px; border-radius: 999px;
+      font-size: .75rem; font-weight: 700;
+    }
+    .conf-pill.high { background: var(--green-100); color: var(--green-700); }
+    .conf-pill.mid  { background: var(--amber-100); color: #92400e; }
+    .conf-pill.low  { background: var(--red-100); color: var(--red-500); }
+    .btn-view-log {
+      padding: 5px 12px; border-radius: var(--radius-sm);
+      border: 1.5px solid var(--slate-200); background: transparent;
+      font-size: .78rem; font-weight: 600; color: var(--green-600);
+      cursor: pointer; transition: all var(--transition);
+    }
+    .btn-view-log:hover { border-color: var(--green-500); background: var(--green-50); }
+    .logs-pagination {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 14px 20px; border-top: 1px solid var(--slate-200);
+      font-size: .84rem; color: var(--slate-500);
+    }
+    .page-btns { display: flex; gap: 6px; }
+    .page-btn {
+      width: 32px; height: 32px; border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      border: 1.5px solid var(--slate-200); background: var(--white);
+      font-size: .82rem; font-weight: 600; cursor: pointer;
+      transition: all var(--transition); color: var(--slate-700);
+    }
+    .page-btn.active { background: var(--green-600); color: var(--white); border-color: var(--green-600); }
+    .page-btn:hover:not(.active) { border-color: var(--green-400); color: var(--green-700); }
+
+    /* ===== MODEL INFO PAGE ===== */
+    .model-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+    .metric-table { width: 100%; border-collapse: collapse; }
+    .metric-table th {
+      padding: 10px 14px; text-align: left;
+      font-size: .75rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .5px; color: var(--slate-500);
+      background: var(--slate-50); border-bottom: 1px solid var(--slate-200);
+    }
+    .metric-table td {
+      padding: 10px 14px; border-bottom: 1px solid var(--slate-100);
+      font-size: .86rem; color: var(--slate-700);
+    }
+    .metric-table tr:last-child td { border-bottom: none; }
+    .metric-val { font-weight: 700; color: var(--slate-900); }
+    .metric-bar-cell { width: 120px; }
+    .metric-bar {
+      height: 6px; border-radius: 3px; background: var(--slate-200); overflow: hidden;
+    }
+    .metric-bar-inner { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--green-400), var(--green-600)); }
+
+    .class-list { display: flex; flex-wrap: wrap; gap: 6px; }
+    .class-chip {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 4px 10px; border-radius: 999px;
+      font-size: .75rem; font-weight: 600;
+      border: 1px solid var(--slate-200); background: var(--slate-50); color: var(--slate-700);
+    }
+    .class-chip.healthy { border-color: var(--green-300); background: var(--green-50); color: var(--green-700); }
+    .class-chip.disease { border-color: #fca5a5; background: var(--red-100); color: var(--red-500); }
+
+    /* Confusion matrix mini */
+    .confusion-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 2px; border-radius: var(--radius-sm); overflow: hidden;
+    }
+    .cm-cell {
+      aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+      font-size: .75rem; font-weight: 700;
+    }
+    .cm-label { font-size: .62rem; color: var(--slate-500); font-weight: 600; }
+
+    /* Training curves mini chart */
+    .curve-wrap { position: relative; height: 120px; }
+    .curve-svg { width: 100%; height: 100%; }
+
+    /* ===== SETTINGS PAGE ===== */
+    .settings-layout { display: grid; grid-template-columns: 220px 1fr; gap: 24px; }
+    .settings-nav-panel {
+      background: var(--white); border: 1px solid var(--slate-200);
+      border-radius: var(--radius-lg); padding: 12px; height: fit-content;
+    }
+    .settings-nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px; border-radius: var(--radius-sm);
+      font-size: .9rem; font-weight: 600; color: var(--slate-600);
+      cursor: pointer; transition: all var(--transition);
+    }
+    .settings-nav-item:hover { background: var(--slate-100); color: var(--slate-800); }
+    .settings-nav-item.active { background: var(--green-50); color: var(--green-700); }
+    .settings-panel { display: none; }
+    .settings-panel.active { display: block; }
+    .settings-section-title {
+      font-size: 1.1rem; font-weight: 800; color: var(--slate-900); margin-bottom: 20px;
+      padding-bottom: 12px; border-bottom: 1px solid var(--slate-200);
+    }
+    .avatar-row {
+      display: flex; align-items: center; gap: 20px; margin-bottom: 24px;
+    }
+    .big-avatar {
+      width: 80px; height: 80px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--green-500), var(--green-700));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem; font-weight: 800; color: var(--white);
+    }
+    .avatar-actions { display: flex; flex-direction: column; gap: 8px; }
+    .btn-avatar {
+      padding: 7px 16px; border-radius: var(--radius-sm);
+      font-size: .82rem; font-weight: 600; cursor: pointer;
+      transition: all var(--transition);
+    }
+    .btn-avatar-change { background: var(--green-600); color: var(--white); border: none; }
+    .btn-avatar-change:hover { background: var(--green-700); }
+    .btn-avatar-remove { background: transparent; border: 1.5px solid var(--slate-200); color: var(--slate-500); }
+    .btn-avatar-remove:hover { border-color: var(--red-500); color: var(--red-500); }
+
+    .settings-form .form-group { margin-bottom: 16px; }
+    .settings-form .form-group label { display: block; font-size: .84rem; font-weight: 600; color: var(--slate-700); margin-bottom: 6px; }
+    .settings-form .form-group input, .settings-form .form-group select {
+      width: 100%; padding: 10px 13px; border: 1.5px solid var(--slate-200);
+      border-radius: var(--radius-sm); font-size: .95rem; color: var(--slate-800);
+      background: var(--white); outline: none; transition: border-color var(--transition);
+    }
+    .settings-form .form-group input:focus, .settings-form .form-group select:focus { border-color: var(--green-500); }
+    .settings-save-row { display: flex; justify-content: flex-end; margin-top: 20px; }
+    .btn-save {
+      padding: 10px 28px; border-radius: var(--radius-sm);
+      background: var(--green-600); color: var(--white);
+      font-size: .9rem; font-weight: 700; border: none;
+      cursor: pointer; transition: all var(--transition);
+    }
+    .btn-save:hover { background: var(--green-700); }
+
+    .lang-options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+    .lang-option {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 16px; border-radius: var(--radius);
+      border: 2px solid var(--slate-200); background: var(--white);
+      cursor: pointer; transition: all var(--transition);
+    }
+    .lang-option:hover { border-color: var(--green-300); }
+    .lang-option.selected { border-color: var(--green-500); background: var(--green-50); }
+    .lang-flag { font-size: 1.5rem; }
+    .lang-name { font-weight: 700; color: var(--slate-800); }
+    .lang-native { font-size: .82rem; color: var(--slate-500); }
+    .lang-check { margin-left: auto; font-size: 1.1rem; display: none; }
+    .lang-option.selected .lang-check { display: block; color: var(--green-600); }
+
+    .danger-zone {
+      border: 1.5px solid #fca5a5; border-radius: var(--radius);
+      padding: 20px; margin-top: 24px;
+    }
+    .danger-zone-title { font-size: .84rem; font-weight: 700; color: var(--red-500); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 12px; }
+    .danger-action {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 0; border-bottom: 1px solid var(--red-100);
+    }
+    .danger-action:last-child { border-bottom: none; }
+    .danger-action p { font-size: .86rem; color: var(--slate-700); font-weight: 600; }
+    .danger-action span { font-size: .78rem; color: var(--slate-500); }
+    .btn-danger {
+      padding: 7px 14px; border-radius: var(--radius-sm);
+      border: 1.5px solid var(--red-500); background: transparent;
+      font-size: .82rem; font-weight: 600; color: var(--red-500);
+      cursor: pointer; transition: all var(--transition);
+    }
+    .btn-danger:hover { background: var(--red-100); }
+
+    @media (max-width: 900px) {
+      .result-row { grid-template-columns: 1fr; }
+      .model-grid { grid-template-columns: 1fr; }
+      .settings-layout { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 540px) {
+      .upload-tips { grid-template-columns: 1fr; }
+      .logs-table th:nth-child(4), .logs-table td:nth-child(4) { display: none; }
+    }
+
+    /* ===== FORGOT PASSWORD MODAL ===== */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.5);
+      backdrop-filter: blur(4px);
+      z-index: 999;
+      display: none; align-items: center; justify-content: center;
+      padding: 24px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 36px;
+      max-width: 420px; width: 100%;
+      box-shadow: var(--shadow-lg);
+      animation: slideUp .2s ease;
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .modal h3 { font-size: 1.3rem; font-weight: 800; color: var(--slate-900); margin-bottom: 6px; }
+    .modal p  { font-size: .88rem; color: var(--slate-500); margin-bottom: 20px; }
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+    .btn-cancel {
+      padding: 10px 20px; border-radius: var(--radius-sm);
+      font-size: .9rem; font-weight: 600;
+      color: var(--slate-600); background: var(--slate-100);
+      border: none; cursor: pointer; transition: background var(--transition);
+    }
+    .btn-cancel:hover { background: var(--slate-200); }
+    .btn-modal-submit {
+      padding: 10px 20px; border-radius: var(--radius-sm);
+      font-size: .9rem; font-weight: 600;
+      color: var(--white); background: var(--green-600);
+      border: none; cursor: pointer; transition: background var(--transition);
+    }
+    .btn-modal-submit:hover { background: var(--green-700); }
+
+    /* ===== TOAST ===== */
+    .toast-container {
+      position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .toast {
+      background: var(--slate-900);
+      color: var(--white);
+      border-radius: var(--radius);
+      padding: 14px 18px;
+      font-size: .88rem; font-weight: 500;
+      display: flex; align-items: center; gap: 10px;
+      box-shadow: var(--shadow-lg);
+      animation: slideUp .2s ease;
+      max-width: 320px;
+    }
+    .toast.success { border-left: 4px solid var(--green-500); }
+    .toast.error   { border-left: 4px solid var(--red-500); }
+    .toast.info    { border-left: 4px solid #60a5fa; }
+
+    /* ===== DASHBOARD SHELL ===== */
+    #page-dashboard { display: none; min-height: 100vh; flex-direction: row; }
+    #page-dashboard.active { display: flex; }
+
+    /* LEFT SIDEBAR */
+    .sidebar {
+      width: 240px;
+      min-width: 240px;
+      background: var(--slate-900);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; left: 0;
+      height: 100vh;
+      z-index: 200;
+      overflow-y: auto;
+      transition: transform .25s ease;
+    }
+    .sidebar-logo {
+      display: flex; align-items: center; gap: 10px;
+      padding: 22px 20px 18px;
+      border-bottom: 1px solid rgba(255,255,255,.07);
+    }
+    .sidebar-logo .logo-leaf {
+      width: 32px; height: 32px; font-size: 15px;
+    }
+    .sidebar-logo-text {
+      font-size: 1.2rem; font-weight: 800;
+      color: var(--white); letter-spacing: -.5px;
+    }
+    .sidebar-logo-text span { color: var(--green-400); }
+
+    .sidebar-section-label {
+      font-size: .65rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1px; color: var(--slate-400);
+      padding: 18px 20px 6px;
+    }
+    .sidebar-nav { display: flex; flex-direction: column; gap: 2px; padding: 0 10px; }
+    .sidebar-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 11px 14px; border-radius: var(--radius);
+      cursor: pointer; transition: all var(--transition);
+      color: var(--slate-400); font-size: .9rem; font-weight: 500;
+      position: relative;
+      text-decoration: none;
+    }
+    .sidebar-item:hover { background: rgba(255,255,255,.06); color: var(--white); }
+    .sidebar-item.active {
+      background: rgba(34,197,94,.15);
+      color: var(--green-400);
+      font-weight: 700;
+    }
+    .sidebar-item.active::before {
+      content: '';
+      position: absolute; left: 0; top: 20%; bottom: 20%;
+      width: 3px; border-radius: 0 3px 3px 0;
+      background: var(--green-400);
+    }
+    .sidebar-icon { font-size: 1.1rem; width: 22px; text-align: center; flex-shrink: 0; }
+    .sidebar-badge {
+      margin-left: auto; background: var(--red-500); color: var(--white);
+      border-radius: 999px; font-size: .65rem; font-weight: 800;
+      padding: 1px 7px; min-width: 18px; text-align: center;
+    }
+    .sidebar-divider {
+      height: 1px; background: rgba(255,255,255,.07);
+      margin: 10px 20px;
+    }
+    .sidebar-bottom {
+      margin-top: auto; padding: 14px 10px 20px;
+      border-top: 1px solid rgba(255,255,255,.07);
+    }
+    .sidebar-user {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px; border-radius: var(--radius);
+      cursor: pointer;
+    }
+    .sidebar-user:hover { background: rgba(255,255,255,.06); }
+    .sidebar-user-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--green-500), var(--green-700));
+      display: flex; align-items: center; justify-content: center;
+      font-size: .9rem; font-weight: 800; color: var(--white);
+      flex-shrink: 0;
+    }
+    .sidebar-user-name { font-size: .88rem; font-weight: 700; color: var(--white); }
+    .sidebar-user-role { font-size: .72rem; color: var(--slate-400); }
+    .sidebar-signout {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px; border-radius: var(--radius);
+      font-size: .88rem; font-weight: 600; color: #f87171;
+      cursor: pointer; transition: background var(--transition);
+      border: none; background: none; width: 100%;
+    }
+    .sidebar-signout:hover { background: rgba(239,68,68,.12); }
+
+    /* MAIN CONTENT AREA */
+    .dash-main {
+      margin-left: 240px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      background: #f8fafc;
+    }
+
+    /* BACKDROP & MOBILE NAV */
+    .sidebar-backdrop {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5);
+      backdrop-filter: blur(2px); z-index: 190;
+    }
+    .sidebar-backdrop.show { display: block; }
+    .mobile-menu-btn { display: none; }
+
+    /* TOP BAR */
+    .dash-topbar {
+      background: var(--white);
+      border-bottom: 1px solid var(--slate-200);
+      padding: 0 32px;
+      height: 60px;
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 1px 4px rgba(0,0,0,.05);
+    }
+    .topbar-title { font-size: 1rem; font-weight: 700; color: var(--slate-800); }
+    .topbar-breadcrumb { font-size: .8rem; color: var(--slate-400); }
+    .topbar-right { display: flex; align-items: center; gap: 12px; }
+    .topbar-search {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--slate-100); border-radius: var(--radius-sm);
+      padding: 7px 14px; border: 1.5px solid transparent;
+      transition: border-color var(--transition);
+    }
+    .topbar-search:focus-within { border-color: var(--green-400); background: var(--white); }
+    .topbar-search input {
+      border: none; background: transparent; outline: none;
+      font-size: .88rem; color: var(--slate-700); width: 180px;
+    }
+    .topbar-icon-btn {
+      width: 36px; height: 36px; border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      background: var(--slate-100); cursor: pointer; font-size: 1rem;
+      border: none; transition: background var(--transition); position: relative;
+    }
+    .topbar-icon-btn:hover { background: var(--slate-200); }
+    .notif-dot {
+      position: absolute; top: 6px; right: 6px;
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--red-500); border: 2px solid var(--white);
+    }
+
+    /* SUBVIEWS */
+    .dash-view { display: none; padding: 28px 32px; }
+    .dash-view.active { display: block; }
+    .view-header { margin-bottom: 24px; }
+    .view-header h2 { font-size: 1.4rem; font-weight: 800; color: var(--slate-900); margin-bottom: 4px; }
+    .view-header p { font-size: .88rem; color: var(--slate-500); }
+
+    /* KPI GRID */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 16px; margin-bottom: 24px;
+    }
+    .kpi-card {
+      background: var(--white); border: 1px solid var(--slate-200);
+      border-radius: var(--radius); padding: 18px 20px;
+      display: flex; align-items: center; gap: 14px;
+    }
+    .kpi-icon {
+      width: 46px; height: 46px; border-radius: var(--radius);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; flex-shrink: 0;
+    }
+    .kpi-num { font-size: 1.6rem; font-weight: 800; color: var(--slate-900); line-height: 1; }
+    .kpi-label { font-size: .75rem; color: var(--slate-500); margin-top: 3px; }
+    .kpi-change { font-size: .75rem; font-weight: 600; margin-top: 2px; }
+    .kpi-change.up { color: var(--green-600); }
+    .kpi-change.down { color: var(--red-500); }
+
+    /* CARDS */
+    .card {
+      background: var(--white); border: 1px solid var(--slate-200);
+      border-radius: var(--radius-lg); padding: 22px;
+    }
+    .card-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 18px;
+    }
+    .card-title { font-size: .95rem; font-weight: 700; color: var(--slate-900); }
+    .card-action {
+      font-size: .82rem; color: var(--green-600); font-weight: 600;
+      cursor: pointer; transition: color var(--transition); border: none; background: none;
+    }
+    .card-action:hover { color: var(--green-800); }
+
+    /* HOME GRID */
+    .home-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+
+    /* Prediction list */
+    .prediction-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 11px 0; border-bottom: 1px solid var(--slate-100);
+    }
+    .prediction-item:last-child { border-bottom: none; }
+    .pred-thumb {
+      width: 42px; height: 42px; border-radius: var(--radius-sm);
+      background: var(--green-50); display: flex; align-items: center;
+      justify-content: center; font-size: 1.3rem; flex-shrink: 0;
+    }
+    .pred-crop { font-size: .88rem; font-weight: 700; color: var(--slate-800); }
+    .pred-disease { font-size: .76rem; color: var(--slate-500); }
+    .pred-time { font-size: .72rem; color: var(--slate-400); }
+    .pred-badge {
+      border-radius: 999px; padding: 3px 10px;
+      font-size: .72rem; font-weight: 700; flex-shrink: 0;
+    }
+    .pred-badge.healthy { background: var(--green-100); color: var(--green-700); }
+    .pred-badge.disease { background: var(--red-100); color: var(--red-500); }
+    .pred-badge.uncertain { background: var(--amber-100); color: #92400e; }
+    .pred-conf { font-size: .78rem; color: var(--slate-500); flex-shrink: 0; min-width: 40px; text-align: right; }
+
+    /* Upload zone */
+    .upload-zone {
+      border: 2px dashed var(--green-300); border-radius: var(--radius);
+      padding: 28px 20px; text-align: center; cursor: pointer;
+      background: var(--green-50); transition: all var(--transition);
+    }
+    .upload-zone:hover { border-color: var(--green-500); background: var(--green-100); }
+    .upload-icon { font-size: 2rem; margin-bottom: 8px; }
+    .upload-text { font-size: .9rem; font-weight: 600; color: var(--green-700); }
+    .upload-sub { font-size: .78rem; color: var(--slate-500); margin-top: 3px; }
+
+    /* Mini bar chart */
+    .chart-bars { display: flex; align-items: flex-end; gap: 6px; height: 80px; }
+    .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+    .bar { width: 100%; border-radius: 3px 3px 0 0; background: var(--green-500); }
+    .bar.disease { background: var(--red-500); }
+    .bar.uncertain { background: var(--amber-500); }
+    .bar-label { font-size: .62rem; color: var(--slate-500); }
+
+    /* Disclaimer */
+    .disclaimer {
+      background: var(--amber-100); border-left: 4px solid var(--amber-500);
+      border-radius: var(--radius-sm); padding: 10px 14px;
+      font-size: .8rem; color: #78350f;
+    }
+
+    /* ===== DETECT DISEASE PAGE ===== */
+    .detect-wrap { max-width: 720px; }
+    .detect-step-bar {
+      display: flex; align-items: center; margin-bottom: 28px;
+    }
+    .ds-item {
+      display: flex; align-items: center; gap: 7px;
+      font-size: .8rem; font-weight: 600; color: var(--slate-400);
+    }
+    .ds-item.active { color: var(--green-700); }
+    .ds-item.done   { color: var(--green-500); }
+    .ds-num {
+      width: 26px; height: 26px; border-radius: 50%;
+      background: var(--slate-200); color: var(--slate-500);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .72rem; font-weight: 800; flex-shrink: 0;
+    }
+    .ds-item.active .ds-num { background: var(--green-600); color: var(--white); }
+    .ds-item.done   .ds-num { background: var(--green-400); color: var(--white); }
+    .ds-line { flex: 1; height: 2px; background: var(--slate-200); margin: 0 8px; }
+    .ds-line.done { background: var(--green-400); }
+
+    /* Upload big */
+    .big-upload {
+      border: 2.5px dashed var(--green-300); border-radius: var(--radius-lg);
+      background: var(--green-50); padding: 52px 32px; text-align: center;
+      cursor: pointer; transition: all var(--transition); position: relative;
+    }
+    .big-upload:hover { border-color: var(--green-500); background: var(--green-100); }
+    .big-upload input[type=file] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+    }
+    .big-upload-icon { font-size: 3rem; margin-bottom: 12px; }
+    .big-upload-title { font-size: 1.05rem; font-weight: 700; color: var(--green-800); margin-bottom: 5px; }
+    .big-upload-sub { font-size: .84rem; color: var(--slate-500); }
+    .btn-browse {
+      display: inline-block; margin-top: 14px;
+      padding: 9px 22px; border-radius: var(--radius-sm);
+      background: var(--green-600); color: var(--white);
+      font-size: .88rem; font-weight: 700; border: none; cursor: pointer;
+      pointer-events: none;
+    }
+    .upload-tips-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px;
+    }
+    .upload-tip {
+      background: var(--white); border: 1px solid var(--slate-200);
+      border-radius: var(--radius); padding: 11px 13px;
+      display: flex; gap: 9px; font-size: .8rem; color: var(--slate-600);
+    }
+
+    /* Preview */
+    .preview-card { background: var(--white); border: 1px solid var(--slate-200); border-radius: var(--radius-lg); padding: 22px; }
+    .preview-img-box {
+      border-radius: var(--radius); overflow: hidden; background: var(--slate-100);
+      display: flex; align-items: center; justify-content: center; min-height: 220px; margin-bottom: 18px;
+    }
+    .preview-img-box img { max-height: 280px; max-width: 100%; object-fit: contain; }
+    .preview-placeholder { text-align: center; color: var(--slate-400); padding: 40px; }
+    .preview-placeholder span { font-size: 3rem; display: block; margin-bottom: 8px; }
+    .preview-actions { display: flex; gap: 12px; }
+    .btn-analyze {
+      flex: 1; padding: 12px; border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, var(--green-600), var(--green-700));
+      color: var(--white); font-size: .95rem; font-weight: 700;
+      border: none; cursor: pointer; transition: all var(--transition);
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-analyze:hover { background: linear-gradient(135deg, var(--green-700), var(--green-800)); }
+    .btn-reupload {
+      padding: 12px 18px; border-radius: var(--radius-sm);
+      border: 1.5px solid var(--slate-200); background: var(--white);
+      color: var(--slate-600); font-size: .9rem; font-weight: 600; cursor: pointer;
+    }
+    .btn-reupload:hover { border-color: var(--slate-400); }
+
+    /* Analyzing */
+    .analyzing-card {
+      background: var(--white); border: 1px solid var(--slate-200);
+      border-radius: var(--radius-lg); padding: 48px 32px; text-align: center;
+    }
+    .big-spinner {
+      width: 68px; height: 68px; border-radius: 50%;
+      border: 5px solid var(--green-100); border-top-color: var(--green-500);
+      animation: spin .9s linear infinite; margin: 0 auto 20px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .analyzing-steps-list { max-width: 300px; margin: 20px auto 0; text-align: left; display: flex; flex-direction: column; gap: 8px; }
+    .an-step {
+      display: flex; align-items: center; gap: 10px;
+      font-size: .84rem; padding: 8px 12px; border-radius: var(--radius-sm);
+      color: var(--slate-500); background: var(--slate-50);
+    }
+    .an-step.done { color: var(--green-700); background: var(--green-50); }
+    .an-step.cur  { color: var(--slate-800); background: var(--amber-100); }
+    .an-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--slate-300); flex-shrink: 0; }
+    .an-step.done .an-dot { background: var(--green-500); }
+    .an-step.cur  .an-dot { background: var(--amber-500); animation: pulse 1s infinite; }
+
+    /* Result */
+    .result-top-card {
+      background: var(--white); border: 1px solid var(--slate-200);
+      border-radius: var(--radius-lg); padding: 22px;
+      display: flex; gap: 18px; align-items: flex-start; margin-bottom: 16px;
+    }
+    .result-leaf {
+      width: 110px; height: 110px; border-radius: var(--radius);
+      background: var(--green-50); display: flex; align-items: center;
+      justify-content: center; font-size: 2.8rem; border: 2px solid var(--slate-200);
+      flex-shrink: 0;
+    }
+    .result-label { font-size: 1.25rem; font-weight: 800; color: var(--slate-900); margin-bottom: 4px; }
+    .result-crop-chip {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: var(--green-100); color: var(--green-700);
+      border-radius: 999px; padding: 3px 11px; font-size: .75rem; font-weight: 700; margin-bottom: 10px;
+    }
+    .conf-row { display: flex; align-items: center; gap: 10px; }
+    .conf-num { font-size: 1.4rem; font-weight: 800; color: var(--green-700); }
+    .conf-bar-bg { flex: 1; height: 7px; border-radius: 4px; background: var(--slate-200); overflow: hidden; }
+    .conf-bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--green-400), var(--green-600)); }
+    .conf-sub { font-size: .75rem; color: var(--slate-500); margin-top: 2px; }
+    .result-ts { font-size: .75rem; color: var(--slate-400); margin-top: 8px; }
+    .result-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+    .result-card {
+      background: var(--white); border: 1px solid var(--slate-200);
+      border-radius: var(--radius-lg); padding: 18px;
+    }
+    .result-card-title {
+      font-size: .72rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .5px; color: var(--slate-500); margin-bottom: 10px;
+    }
+    .result-card p { font-size: .86rem; color: var(--slate-700); line-height: 1.6; }
+    .remedy-list { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+    .remedy-item {
+      display: flex; gap: 9px; align-items: flex-start;
+      font-size: .84rem; color: var(--slate-700);
+      background: var(--green-50); padding: 8px; border-radius: var(--radius-sm);
+    }
+    .remedy-num {
+      width: 20px; height: 20px; border-radius: 50%;
+      background: var(--green-500); color: var(--white);
+      font-size: .68rem; font-weight: 800;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .source-row { font-size: .74rem; color: var(--green-600); font-weight: 600; margin-top: 10px; cursor: pointer; }
+    .gradcam-box {
+      position: relative; border-radius: var(--radius); overflow: hidden;
+      background: var(--slate-100); min-height: 130px;
+      display: flex; align-items: center; justify-content: center; font-size: 3rem;
+    }
+    .gradcam-heat {
+      position: absolute; inset: 0; border-radius: var(--radius);
+      background: radial-gradient(ellipse at 55% 45%, rgba(239,68,68,.5) 0%, rgba(245,158,11,.3) 40%, transparent 70%);
+    }
+    .gradcam-label { font-size: .72rem; color: var(--slate-500); text-align: center; margin-top: 6px; font-style: italic; }
+    .uncertainty-box {
+      background: var(--amber-100); border: 1px solid #fcd34d;
+      border-radius: var(--radius); padding: 13px 15px;
+      font-size: .84rem; color: #78350f; display: flex; gap: 10px; margin-bottom: 14px;
+    }
+    .new-scan-btn {
+      padding: 11px 24px; border-radius: var(--radius-sm);
+      background: var(--green-600); color: var(--white);
+      font-size: .9rem; font-weight: 700; border: none; cursor: pointer;
+      transition: background var(--transition);
+    }
+    .new-scan-btn:hover { background: var(--green-700); }
+
+    /* ===== PREDICTION LOGS ===== */
+    .logs-filters {
+      background: var(--white); border: 1px solid var(--slate-200);
+      border-radius: var(--radius-lg); padding: 18px 22px;
+      margin-bottom: 18px; display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end;
+    }
+    .fgroup { display: flex; flex-direction: column; gap: 4px; }
+    .fgroup label { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--slate-500); }
+    .fgroup select, .fgroup input {
+      padding: 7px 11px; border: 1.5px solid var(--slate-200);
+      border-radius: var(--radius-sm); font-size: .86rem; color: var(--slate-800);
+      background: var(--white); outline: none; min-width: 130px;
+      transition: border-color var(--transition);
+    }
+    .fgroup select:focus, .fgroup input:focus { border-color: var(--green-500); }
+    .btn-reset {
+      padding: 8px 14px; border-radius: var(--radius-sm);
+      border: 1.5px solid var(--slate-200); background: var(--white);
+      font-size: .84rem; font-weight: 600; color: var(--slate-500);
+      cursor: pointer; align-self: flex-end; transition: all var(--transition);
+    }
+    .btn-reset:hover { border-color: var(--red-500); color: var(--red-500); }
+    .logs-wrap {
+      background: var(--white); border: 1px solid var(--slate-200);
+      border-radius: var(--radius-lg); overflow: hidden;
+    }
+    .logs-table { width: 100%; border-collapse: collapse; }
+    .logs-table th {
+      padding: 11px 15px; text-align: left; font-size: .72rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .5px; color: var(--slate-500);
+      background: var(--slate-50); border-bottom: 1px solid var(--slate-200);
+    }
+    .logs-table td {
+      padding: 12px 15px; border-bottom: 1px solid var(--slate-100);
+      font-size: .86rem; color: var(--slate-700); vertical-align: middle;
+    }
+    .logs-table tr:last-child td { border-bottom: none; }
+    .logs-table tr:hover td { background: var(--slate-50); }
+    .log-thumb {
+      width: 34px; height: 34px; border-radius: var(--radius-sm);
+      background: var(--green-50); display: flex; align-items: center;
+      justify-content: center; font-size: 1.1rem;
+    }
+    .log-crop-name { font-weight: 700; color: var(--slate-900); }
+    .log-disease-name { font-size: .76rem; color: var(--slate-500); }
+    .cpill {
+      display: inline-block; padding: 2px 9px; border-radius: 999px;
+      font-size: .72rem; font-weight: 700;
+    }
+    .cpill.high { background: var(--green-100); color: var(--green-700); }
+    .cpill.mid  { background: var(--amber-100); color: #92400e; }
+    .cpill.low  { background: var(--red-100);   color: var(--red-500); }
+    .btn-vlog {
+      padding: 4px 11px; border-radius: var(--radius-sm);
+      border: 1.5px solid var(--slate-200); background: transparent;
+      font-size: .76rem; font-weight: 600; color: var(--green-600);
+      cursor: pointer; transition: all var(--transition);
+    }
+    .btn-vlog:hover { border-color: var(--green-400); background: var(--green-50); }
+    .logs-footer {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 18px; border-top: 1px solid var(--slate-200);
+      font-size: .82rem; color: var(--slate-500);
+    }
+    .pg-btns { display: flex; gap: 5px; }
+    .pg-btn {
+      width: 30px; height: 30px; border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      border: 1.5px solid var(--slate-200); background: var(--white);
+      font-size: .8rem; font-weight: 600; cursor: pointer; color: var(--slate-700);
+      transition: all var(--transition);
+    }
+    .pg-btn.active { background: var(--green-600); color: var(--white); border-color: var(--green-600); }
+    .pg-btn:hover:not(.active) { border-color: var(--green-400); color: var(--green-700); }
+
+    /* ===== MODEL INFO ===== */
+    .model-layout { display: grid; grid-template-columns: 7fr 5fr; gap: 20px; }
+    .metric-tbl { width: 100%; border-collapse: collapse; }
+    .metric-tbl th {
+      padding: 9px 13px; font-size: .72rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .5px; color: var(--slate-500); background: var(--slate-50);
+      border-bottom: 1px solid var(--slate-200); text-align: left;
+    }
+    .metric-tbl td { padding: 9px 13px; border-bottom: 1px solid var(--slate-100); font-size: .84rem; color: var(--slate-700); }
+    .metric-tbl tr:last-child td { border-bottom: none; }
+    .mv { font-weight: 700; color: var(--slate-900); }
+    .mbar-wrap { display: flex; align-items: center; gap: 8px; }
+    .mbar { flex: 1; height: 5px; border-radius: 3px; background: var(--slate-200); overflow: hidden; }
+    .mbar-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--green-400), var(--green-600)); }
+    .class-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .ctag {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 9px; border-radius: 999px; font-size: .72rem; font-weight: 600;
+      border: 1px solid var(--slate-200); background: var(--slate-50); color: var(--slate-700);
+    }
+    .ctag.h { border-color: var(--green-300); background: var(--green-50); color: var(--green-700); }
+    .ctag.d { border-color: #fca5a5; background: var(--red-100); color: var(--red-500); }
+    .model-status-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+    .status-pill {
+      display: flex; align-items: center; gap: 7px;
+      padding: 7px 14px; border-radius: 999px;
+      font-size: .8rem; font-weight: 700;
+      background: var(--green-50); color: var(--green-700); border: 1px solid var(--green-300);
+    }
+    .status-pill .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green-500); animation: pulse 2s infinite; }
+
+    /* Training curve SVG */
+    .curve-area { position: relative; height: 110px; overflow: hidden; }
+    .curve-area svg { width: 100%; height: 100%; }
+
+    /* ===== SETTINGS ===== */
+    .settings-layout { display: grid; grid-template-columns: 200px 1fr; gap: 22px; }
+    .settings-sidebar {
+      background: var(--white); border: 1px solid var(--slate-200);
+      border-radius: var(--radius-lg); padding: 10px; height: fit-content;
+    }
+    .stab {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px; border-radius: var(--radius-sm);
+      font-size: .88rem; font-weight: 600; color: var(--slate-500);
+      cursor: pointer; transition: all var(--transition);
+    }
+    .stab:hover { background: var(--slate-100); color: var(--slate-800); }
+    .stab.active { background: var(--green-50); color: var(--green-700); }
+    .spanel { display: none; }
+    .spanel.active { display: block; }
+    .stitle {
+      font-size: 1rem; font-weight: 800; color: var(--slate-900);
+      margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--slate-200);
+    }
+    .avatar-row { display: flex; align-items: center; gap: 18px; margin-bottom: 22px; }
+    .big-av {
+      width: 76px; height: 76px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--green-500), var(--green-700));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.9rem; font-weight: 800; color: var(--white);
+    }
+    .sform .fgrp { margin-bottom: 15px; }
+    .sform .fgrp label { display: block; font-size: .82rem; font-weight: 600; color: var(--slate-700); margin-bottom: 5px; }
+    .sform .fgrp input, .sform .fgrp select {
+      width: 100%; padding: 9px 12px; border: 1.5px solid var(--slate-200);
+      border-radius: var(--radius-sm); font-size: .9rem; color: var(--slate-800);
+      background: var(--white); outline: none; transition: border-color var(--transition);
+    }
+    .sform .fgrp input:focus, .sform .fgrp select:focus { border-color: var(--green-500); }
+    .sform-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .btn-save {
+      padding: 10px 26px; border-radius: var(--radius-sm);
+      background: var(--green-600); color: var(--white);
+      font-size: .9rem; font-weight: 700; border: none; cursor: pointer; transition: background var(--transition);
+    }
+    .btn-save:hover { background: var(--green-700); }
+    .lang-opts { display: flex; flex-direction: column; gap: 10px; }
+    .lang-opt {
+      display: flex; align-items: center; gap: 13px;
+      padding: 13px 15px; border-radius: var(--radius);
+      border: 2px solid var(--slate-200); cursor: pointer; transition: all var(--transition);
+    }
+    .lang-opt:hover { border-color: var(--green-300); }
+    .lang-opt.sel { border-color: var(--green-500); background: var(--green-50); }
+    .lang-flag { font-size: 1.4rem; }
+    .lang-name { font-weight: 700; color: var(--slate-800); font-size: .9rem; }
+    .lang-native { font-size: .78rem; color: var(--slate-500); }
+    .lang-chk { margin-left: auto; display: none; color: var(--green-600); font-size: 1.1rem; }
+    .lang-opt.sel .lang-chk { display: block; }
+    .danger-box { border: 1.5px solid #fca5a5; border-radius: var(--radius); padding: 18px; margin-top: 22px; }
+    .danger-title { font-size: .78rem; font-weight: 700; color: var(--red-500); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 12px; }
+    .danger-row { display: flex; justify-content: space-between; align-items: center; padding: 11px 0; border-bottom: 1px solid var(--red-100); }
+    .danger-row:last-child { border-bottom: none; }
+    .danger-row-label { font-size: .86rem; font-weight: 600; color: var(--slate-700); }
+    .danger-row-sub { font-size: .76rem; color: var(--slate-400); }
+    .btn-danger {
+      padding: 6px 13px; border-radius: var(--radius-sm);
+      border: 1.5px solid var(--red-500); background: transparent;
+      font-size: .8rem; font-weight: 600; color: var(--red-500); cursor: pointer; transition: background var(--transition);
+    }
+    .btn-danger:hover { background: var(--red-100); }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 1024px) {
+      .home-grid { grid-template-columns: 1fr; }
+      .model-layout { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .mobile-menu-btn { display: flex !important; }
+      .dash-main { margin-left: 0; }
+      .settings-layout { grid-template-columns: 1fr; }
+      .result-row { grid-template-columns: 1fr; }
+      .sform-row { grid-template-columns: 1fr; }
+      .dash-view { padding: 20px 16px; }
+      .dash-topbar { padding: 0 16px; }
+    }
+    @media (max-width: 540px) {
+      .upload-tips-grid { grid-template-columns: 1fr; }
+      .hero { padding: 60px 16px 40px; }
+      .hero-stats { gap: 20px; }
+      .section { padding: 56px 16px; }
+      .form-row { grid-template-columns: 1fr; }
+      .btn-lg { padding: 12px 24px; font-size: .95rem; }
+    }
+
+    @media (max-width: 900px) {
+      #page-auth.active { grid-template-columns: 1fr; }
+      .auth-left { display: none; }
+      .auth-right { padding: 40px 24px; }
+      .landing-nav { padding: 16px 20px; }
+      .footer-grid { grid-template-columns: 1fr; }
+      .steps::before { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ==================== LANDING PAGE ==================== -->
+<div id="page-landing" class="page active">
+
+  <!-- NAV -->
+  <nav class="landing-nav">
+    <div class="logo">
+      <div class="logo-leaf"><span>🌿</span></div>
+      LeafGuard
+    </div>
+    <div class="nav-links">
+      <button class="btn btn-ghost btn-sm" onclick="scrollToSection('features')">Features</button>
+      <button class="btn btn-ghost btn-sm" onclick="scrollToSection('how-it-works')">How It Works</button>
+      <button class="btn btn-primary btn-sm" onclick="showAuth('signin')">Sign In / Login</button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-badge">
+      <div class="dot"></div>
+      AI-Powered Plant Intelligence
+    </div>
+    <h1>Detect Crop Diseases<br>with <span>AI Precision</span></h1>
+    <p>Upload a leaf photograph and get an instant, evidence-backed disease assessment with practical next steps — built for farmers and agricultural professionals.</p>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-num">38+</div><div class="stat-label">Disease Classes</div></div>
+      <div class="stat"><div class="stat-num">95%</div><div class="stat-label">Model Accuracy</div></div>
+      <div class="stat"><div class="stat-num">3</div><div class="stat-label">Languages</div></div>
+      <div class="stat"><div class="stat-num">&lt;3s</div><div class="stat-label">Inference Time</div></div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-card">
+        <div class="hero-card-icon">🍃</div>
+        <div>
+          <div class="hero-card-title">Tomato Early Blight</div>
+          <div class="hero-card-sub">Alternaria solani detected • Practical treatment guidance available</div>
+        </div>
+        <div class="hero-card-badge">92% Confidence</div>
+      </div>
+      <div style="margin-top: 10px;" class="hero-card">
+        <div class="hero-card-icon">🌾</div>
+        <div>
+          <div class="hero-card-title">Wheat — Healthy Leaf</div>
+          <div class="hero-card-sub">No disease detected • Continue normal monitoring</div>
+        </div>
+        <div class="hero-card-badge">98% Confidence</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <div style="background: var(--white);">
+    <section class="section" id="features">
+      <div class="section-tag">Platform Features</div>
+      <h2>Everything You Need for<br>Plant Health Monitoring</h2>
+      <p>From instant AI diagnosis to curated treatment guidance — LeafGuard covers the full workflow.</p>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon green">🤖</div>
+          <h3>AI-Powered Detection</h3>
+          <p>Transfer learning with EfficientNet fine-tuned on PlantVillage dataset. Confidence scores and Grad-CAM heatmap overlays for transparency.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon amber">📋</div>
+          <h3>Curated Guidance</h3>
+          <p>Crop- and disease-specific remedy steps from verified agricultural sources — ICAR, KVK, and university extension services.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon blue">📊</div>
+          <h3>Prediction History</h3>
+          <p>Searchable and filterable scan history by crop, disease, confidence range, and date. Track trends across your fields over time.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon red">🔍</div>
+          <h3>Explainable Results</h3>
+          <p>Grad-CAM activation maps highlight which leaf regions influenced the prediction — making AI decisions understandable, not a black box.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon green">🌐</div>
+          <h3>Multilingual Support</h3>
+          <p>Interface and guidance available in English, Hindi, and Bengali — designed to serve farmers across diverse agricultural regions.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon amber">📱</div>
+          <h3>Mobile-First PWA</h3>
+          <p>Works on any smartphone or desktop browser. Upload from camera roll or capture directly in the field. No app installation needed.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <div class="landing-alt">
+    <section class="section" id="how-it-works">
+      <div class="section-tag">Simple Process</div>
+      <h2>From Leaf to Diagnosis<br>in Seconds</h2>
+      <p>Four simple steps from photo to actionable plant health insights.</p>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <h4>Create Account</h4>
+          <p>Sign up for free in under 60 seconds.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <h4>Upload Leaf Photo</h4>
+          <p>Capture or upload a clear JPG/PNG image of the affected leaf.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <h4>AI Analysis</h4>
+          <p>Our model classifies the crop, disease, and confidence in under 3 seconds.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <h4>Get Guidance</h4>
+          <p>Receive evidence-backed treatment steps and save results to your history.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- TESTIMONIALS -->
+  <div style="background: var(--white);">
+    <section class="section">
+      <div class="section-tag">Trusted by Farmers</div>
+      <h2>What Agricultural Workers Say</h2>
+      <p>Built for the real needs of farmers, researchers, and agri-extension workers.</p>
+      <div class="testimonials-grid">
+        <div class="testimonial">
+          <div class="testimonial-stars">★★★★★</div>
+          <p>"LeafGuard identified the blast disease on my rice crop within seconds. The guidance helped me act before it spread to the whole field."</p>
+          <div class="testimonial-author">
+            <div class="avatar" style="background: var(--green-600);">R</div>
+            <div>
+              <div class="author-name">Rajesh Kumar</div>
+              <div class="author-role">Rice Farmer, Bihar</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial">
+          <div class="testimonial-stars">★★★★★</div>
+          <p>"As an agricultural student, I love the model info section — confidence scores and F1 metrics make it a real research tool, not just a demo."</p>
+          <div class="testimonial-author">
+            <div class="avatar" style="background: #3b82f6;">P</div>
+            <div>
+              <div class="author-name">Priya Sharma</div>
+              <div class="author-role">MSc Agriculture, Punjab</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial">
+          <div class="testimonial-stars">★★★★☆</div>
+          <p>"The multilingual support in Hindi makes it accessible for farmers in our region who aren't comfortable with English-only tools."</p>
+          <div class="testimonial-author">
+            <div class="avatar" style="background: var(--amber-500);">A</div>
+            <div>
+              <div class="author-name">Amit Patel</div>
+              <div class="author-role">KVK Extension Officer, Gujarat</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- CTA BANNER -->
+  <div class="cta-banner">
+    <h2>Ready to Protect Your Crops?</h2>
+    <p>Join thousands of farmers using AI-powered plant health screening. Free to get started.</p>
+    <div class="disclaimer" style="margin: 0 auto 28px;">
+      ⚠️ LeafGuard is a decision-support tool. Always confirm uncertain or serious cases with a qualified local agricultural professional.
+    </div>
+    <div style="display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;">
+      <button class="btn btn-primary btn-lg" onclick="showAuth('signup')">Create Free Account</button>
+      <button class="btn btn-ghost btn-lg" onclick="showAuth('signin')">Sign In →</button>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="landing-footer">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="logo" style="color: var(--white);">
+          <div class="logo-leaf"><span>🌿</span></div>
+          LeafGuard
+        </div>
+        <p>AI-Powered Plant Health Intelligence Platform. Making plant disease screening accessible to every farmer.</p>
+        <div class="disclaimer" style="margin-top: 14px;">
+          ⚠️ AI predictions can be wrong. For severe or spreading symptoms, consult a qualified agricultural expert.
+        </div>
+      </div>
+      <div class="footer-col">
+        <h5>Product</h5>
+        <ul>
+          <li onclick="scrollToSection('features')">Features</li>
+          <li onclick="scrollToSection('how-it-works')">How It Works</li>
+          <li>Model Info</li>
+          <li>API Documentation</li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Company</h5>
+        <ul>
+          <li>About</li>
+          <li>Privacy Policy</li>
+          <li>Terms of Service</li>
+          <li>Contact</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 LeafGuard. Built for AgriTech Hackathon.</p>
+      <p style="font-size: .78rem;">Dataset: PlantVillage · Model: EfficientNet · Backend: FastAPI + Supabase</p>
+    </div>
+  </footer>
+</div><!-- /landing -->
+
+
+<!-- ==================== AUTH PAGE ==================== -->
+<div id="page-auth" class="page">
+
+  <!-- LEFT PANEL -->
+  <div class="auth-left">
+    <div class="auth-left-content">
+      <div class="logo" style="color: var(--white);">
+        <div class="logo-leaf"><span>🌿</span></div>
+        LeafGuard
+      </div>
+      <h2>AI Plant Health<br>Intelligence</h2>
+      <p>Detect crop diseases from a single leaf photograph — practical, accessible, evidence-backed.</p>
+      <div class="auth-features">
+        <div class="auth-feature">
+          <div class="auth-feature-icon">🤖</div>
+          <div>
+            <span class="auth-feature-title">Instant AI Diagnosis</span>
+            <div class="auth-feature-text">EfficientNet model with 95%+ accuracy on PlantVillage dataset</div>
+          </div>
+        </div>
+        <div class="auth-feature">
+          <div class="auth-feature-icon">🌿</div>
+          <div>
+            <span class="auth-feature-title">38+ Disease Classes</span>
+            <div class="auth-feature-text">Covering tomato, wheat, rice, potato, corn, and more</div>
+          </div>
+        </div>
+        <div class="auth-feature">
+          <div class="auth-feature-icon">📊</div>
+          <div>
+            <span class="auth-feature-title">Full Scan History</span>
+            <div class="auth-feature-text">Filterable prediction logs with confidence scores and timestamps</div>
+          </div>
+        </div>
+        <div class="auth-feature">
+          <div class="auth-feature-icon">🌐</div>
+          <div>
+            <span class="auth-feature-title">English · Hindi · Bengali</span>
+            <div class="auth-feature-text">Multilingual interface for diverse agricultural communities</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="auth-right">
+    <div class="auth-box">
+      <!-- Back to landing -->
+      <button class="btn btn-ghost btn-sm" style="color: var(--slate-500); border: 1.5px solid var(--slate-200); margin-bottom: 28px; background: var(--white);" onclick="showPage('landing')">
+        ← Back to Home
+      </button>
+
+      <!-- Tabs -->
+      <div class="auth-tabs">
+        <div class="auth-tab active" id="tab-signin" onclick="switchTab('signin')">Sign In</div>
+        <div class="auth-tab" id="tab-signup" onclick="switchTab('signup')">Create Account</div>
+      </div>
+
+      <!-- Alert -->
+      <div class="alert alert-success" id="auth-alert-success">✅ <span id="auth-alert-text"></span></div>
+      <div class="alert alert-error" id="auth-alert-error">❌ <span id="auth-alert-err-text"></span></div>
+
+      <!-- SIGN IN FORM -->
+      <div class="auth-form active" id="form-signin">
+        <h3>Welcome back 👋</h3>
+        <p class="sub">Sign in to access your scan history and dashboard.</p>
+
+        <div class="form-group">
+          <label>Email Address</label>
+          <div class="input-with-icon">
+            <span class="input-icon">✉️</span>
+            <input type="email" id="signin-email" placeholder="you@example.com" autocomplete="email" />
+          </div>
+          <div class="field-error" id="signin-email-err">Please enter a valid email address.</div>
+        </div>
+
+        <div class="form-group">
+          <label>Password</label>
+          <div class="input-with-icon">
+            <span class="input-icon">🔒</span>
+            <input type="password" id="signin-password" placeholder="Your password" autocomplete="current-password" />
+            <button class="password-toggle" onclick="togglePassword('signin-password', this)" tabindex="-1">👁️</button>
+          </div>
+          <div class="field-error" id="signin-pass-err">Password is required.</div>
+        </div>
+
+        <div class="remember-row">
+          <label class="checkbox-label">
+            <input type="checkbox" id="remember-me" /> Remember me
+          </label>
+          <span class="forgot-link" onclick="openForgot()">Forgot password?</span>
+        </div>
+
+        <button class="btn-auth" id="signin-btn" onclick="handleSignIn()">
+          <span id="signin-btn-text">Sign In to LeafGuard</span>
+          <div class="spinner" id="signin-spinner"></div>
+        </button>
+
+        <div class="divider">or continue with</div>
+        <button class="btn-social" onclick="socialLogin('Google')">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Continue with Google
+        </button>
+
+        <p class="terms-text">Don't have an account? <a onclick="switchTab('signup')">Create one free →</a></p>
+      </div>
+
+      <!-- SIGN UP FORM -->
+      <div class="auth-form" id="form-signup">
+        <h3>Create your account</h3>
+        <p class="sub">Start detecting plant diseases for free today.</p>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>First Name</label>
+            <input type="text" id="signup-fname" placeholder="Rajesh" autocomplete="given-name" />
+            <div class="field-error" id="signup-fname-err">First name is required.</div>
+          </div>
+          <div class="form-group">
+            <label>Last Name</label>
+            <input type="text" id="signup-lname" placeholder="Kumar" autocomplete="family-name" />
+            <div class="field-error" id="signup-lname-err">Last name is required.</div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Email Address</label>
+          <div class="input-with-icon">
+            <span class="input-icon">✉️</span>
+            <input type="email" id="signup-email" placeholder="you@example.com" autocomplete="email" />
+          </div>
+          <div class="field-error" id="signup-email-err">Please enter a valid email address.</div>
+        </div>
+
+        <div class="form-group">
+          <label>Role</label>
+          <select id="signup-role">
+            <option value="">Select your role…</option>
+            <option value="farmer">Farmer / Agri-worker</option>
+            <option value="researcher">Agricultural Researcher / Student</option>
+            <option value="extension">Extension Officer (KVK / ICAR)</option>
+            <option value="other">Other</option>
+          </select>
+          <div class="field-error" id="signup-role-err">Please select your role.</div>
+        </div>
+
+        <div class="form-group">
+          <label>Password</label>
+          <div class="input-with-icon">
+            <span class="input-icon">🔒</span>
+            <input type="password" id="signup-password" placeholder="Create a strong password" autocomplete="new-password" oninput="checkStrength(this.value)" />
+            <button class="password-toggle" onclick="togglePassword('signup-password', this)" tabindex="-1">👁️</button>
+          </div>
+          <div class="password-strength">
+            <div class="strength-bar"><div class="strength-fill" id="strength-fill"></div></div>
+            <div class="strength-text" id="strength-text">Enter a password</div>
+          </div>
+          <div class="field-error" id="signup-pass-err">Password must be at least 8 characters.</div>
+        </div>
+
+        <div class="form-group">
+          <label>Confirm Password</label>
+          <div class="input-with-icon">
+            <span class="input-icon">🔒</span>
+            <input type="password" id="signup-confirm" placeholder="Repeat your password" autocomplete="new-password" />
+            <button class="password-toggle" onclick="togglePassword('signup-confirm', this)" tabindex="-1">👁️</button>
+          </div>
+          <div class="field-error" id="signup-confirm-err">Passwords do not match.</div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 20px;">
+          <label class="checkbox-label">
+            <input type="checkbox" id="agree-terms" />
+            I agree to the <a style="color: var(--green-600); font-weight: 600;">Terms of Service</a> and <a style="color: var(--green-600); font-weight: 600;">Privacy Policy</a>
+          </label>
+          <div class="field-error" id="signup-terms-err">You must agree to the terms to continue.</div>
+        </div>
+
+        <button class="btn-auth" id="signup-btn" onclick="handleSignUp()">
+          <span id="signup-btn-text">Create Free Account</span>
+          <div class="spinner" id="signup-spinner"></div>
+        </button>
+
+        <div class="divider">or</div>
+        <button class="btn-social" onclick="socialLogin('Google')">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Sign up with Google
+        </button>
+
+        <p class="terms-text" style="margin-top: 10px;">Already have an account? <a onclick="switchTab('signin')">Sign in →</a></p>
+      </div>
+    </div>
+  </div>
+</div><!-- /auth -->
+
+
+<!-- ==================== DASHBOARD PAGE ==================== -->
+<div id="page-dashboard" class="page">
+
+  <!-- LEFT SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <!-- Brand -->
+    <div class="sidebar-logo">
+      <div class="logo-leaf"><span>🌿</span></div>
+      <div class="sidebar-logo-text">Leaf<span>Guard</span></div>
+    </div>
+
+    <!-- Nav Items -->
+    <div class="sidebar-section-label">Main Menu</div>
+    <div class="sidebar-nav">
+      <div class="sidebar-item active" id="sitem-home" onclick="switchDashView('home')">
+        <span class="sidebar-icon">📊</span>
+        <span>Dashboard</span>
+      </div>
+      <div class="sidebar-item" id="sitem-detect" onclick="switchDashView('detect')">
+        <span class="sidebar-icon">🔬</span>
+        <span>Detect Disease</span>
+      </div>
+      <div class="sidebar-item" id="sitem-logs" onclick="switchDashView('logs')">
+        <span class="sidebar-icon">📋</span>
+        <span>Prediction Logs</span>
+        <span class="sidebar-badge" id="logs-badge">24</span>
+      </div>
+      <div class="sidebar-item" id="sitem-model" onclick="switchDashView('model')">
+        <span class="sidebar-icon">🧠</span>
+        <span>Model Info</span>
+      </div>
+      <div class="sidebar-item" id="sitem-settings" onclick="switchDashView('settings')">
+        <span class="sidebar-icon">⚙️</span>
+        <span>Settings</span>
+      </div>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-section-label">Quick Actions</div>
+    <div class="sidebar-nav">
+      <div class="sidebar-item" onclick="switchDashView('detect')">
+        <span class="sidebar-icon">📷</span>
+        <span>New Scan</span>
+      </div>
+      <div class="sidebar-item" onclick="showToast('info', 'ℹ️ Multilingual support: English, Hindi, Bengali active in Settings.')">
+        <span class="sidebar-icon">🌐</span>
+        <span>Language: EN</span>
+      </div>
+    </div>
+
+    <!-- User / Sign Out -->
+    <div class="sidebar-bottom">
+      <div class="sidebar-user" onclick="switchDashView('settings')">
+        <div class="sidebar-user-avatar" id="dash-avatar">R</div>
+        <div>
+          <div class="sidebar-user-name" id="dash-username">Rajesh Kumar</div>
+          <div class="sidebar-user-role" id="dash-role">Farmer</div>
+        </div>
+      </div>
+      <button class="sidebar-signout" onclick="handleSignOut()">
+        <span>🚪</span>
+        <span>Sign Out</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN AREA -->
+  <div class="dash-main">
+
+    <!-- TOPBAR -->
+    <header class="dash-topbar">
+      <div>
+        <div class="topbar-title" id="topbar-title">Dashboard Overview</div>
+        <div class="topbar-breadcrumb" id="topbar-breadcrumb">LeafGuard &gt; Dashboard</div>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-search">
+          <span>🔍</span>
+          <input type="text" placeholder="Search crops, diseases…" oninput="handleGlobalSearch(this.value)" />
+        </div>
+        <button class="topbar-icon-btn" onclick="showToast('info', '🔔 No unread alerts. All systems healthy.')">
+          🔔
+          <span class="notif-dot"></span>
+        </button>
+        <button class="btn btn-green btn-sm" onclick="switchDashView('detect')">
+          + New Scan
+        </button>
+      </div>
+    </header>
+
+    <!-- ===== VIEW: DASHBOARD OVERVIEW ===== -->
+    <div class="dash-view active" id="view-home">
+      <div class="view-header">
+        <h2>Welcome back, <span id="dash-first-name">Rajesh</span> 👋</h2>
+        <p id="dash-date">Tuesday, 11 November 2026 — Here is your crop health summary</p>
+      </div>
+
+      <!-- KPI Cards -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-icon" style="background: var(--green-100);">🔬</div>
+          <div>
+            <div class="kpi-num" id="kpi-total">24</div>
+            <div class="kpi-label">Total Scans</div>
+            <div class="kpi-change up">↑ 6 this week</div>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon" style="background: var(--red-100);">🦠</div>
+          <div>
+            <div class="kpi-num" id="kpi-diseased">9</div>
+            <div class="kpi-label">Diseases Detected</div>
+            <div class="kpi-change down">↑ 3 from last week</div>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon" style="background: var(--green-100);">✅</div>
+          <div>
+            <div class="kpi-num" id="kpi-healthy">13</div>
+            <div class="kpi-label">Healthy Plants</div>
+            <div class="kpi-change up">↑ 2 from last week</div>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon" style="background: var(--amber-100);">📈</div>
+          <div>
+            <div class="kpi-num">87%</div>
+            <div class="kpi-label">Avg Confidence</div>
+            <div class="kpi-change up">↑ 2% improvement</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Grid -->
+      <div class="home-grid">
+        <!-- Recent Predictions -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Recent Scans</span>
+            <button class="card-action" onclick="switchDashView('logs')">View All (24) →</button>
+          </div>
+          <div id="home-pred-list">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <!-- Right Side -->
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+          <!-- Quick scan box -->
+          <div class="card">
+            <div class="card-title" style="margin-bottom: 12px;">Quick Disease Detection</div>
+            <div class="upload-zone" onclick="switchDashView('detect')">
+              <div class="upload-icon">📷</div>
+              <div class="upload-text">Start New Leaf Scan</div>
+              <div class="upload-sub">JPG, PNG · Max 10MB · One leaf per photo</div>
+            </div>
+            <div class="disclaimer" style="margin-top: 12px;">
+              ⚠️ AI estimates only. Always consult a local agricultural officer for severe cases.
+            </div>
+          </div>
+
+          <!-- Weekly chart -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Weekly Activity</span>
+            </div>
+            <div class="chart-bars" id="chart-bars"></div>
+            <div style="display: flex; gap: 12px; margin-top: 10px; flex-wrap: wrap;">
+              <div style="display: flex; align-items: center; gap: 5px; font-size: .75rem; color: var(--slate-600);">
+                <div style="width: 9px; height: 9px; border-radius: 2px; background: var(--green-500);"></div> Healthy
+              </div>
+              <div style="display: flex; align-items: center; gap: 5px; font-size: .75rem; color: var(--slate-600);">
+                <div style="width: 9px; height: 9px; border-radius: 2px; background: var(--red-500);"></div> Disease
+              </div>
+              <div style="display: flex; align-items: center; gap: 5px; font-size: .75rem; color: var(--slate-600);">
+                <div style="width: 9px; height: 9px; border-radius: 2px; background: var(--amber-500);"></div> Uncertain
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /view-home -->
+
+    <!-- ===== VIEW: DETECT DISEASE ===== -->
+    <div class="dash-view" id="view-detect">
+      <div class="detect-wrap">
+        <div class="view-header">
+          <h2>Detect Plant Disease 🔬</h2>
+          <p>Upload a clear leaf photograph to run AI screening and receive verified next steps.</p>
+        </div>
+
+        <!-- Progress Steps -->
+        <div class="detect-step-bar">
+          <div class="ds-item active" id="ds-1">
+            <div class="ds-num">1</div>
+            <span>Upload Photo</span>
+          </div>
+          <div class="ds-line" id="dsl-1"></div>
+          <div class="ds-item" id="ds-2">
+            <div class="ds-num">2</div>
+            <span>Preview &amp; Confirm</span>
+          </div>
+          <div class="ds-line" id="dsl-2"></div>
+          <div class="ds-item" id="ds-3">
+            <div class="ds-num">3</div>
+            <span>AI Result &amp; Guidance</span>
+          </div>
+        </div>
+
+        <!-- STEP 1: UPLOAD -->
+        <div id="detect-step-upload">
+          <div class="big-upload" id="big-drop-zone">
+            <input type="file" id="leaf-file-input" accept="image/jpeg,image/png" onchange="handleFileSelect(event)" />
+            <div class="big-upload-icon">🍃</div>
+            <div class="big-upload-title">Drop your leaf photo here, or click to browse</div>
+            <div class="big-upload-sub">Supports JPG, PNG up to 10 MB</div>
+            <div><button class="btn-browse" tabindex="-1">Browse Photos</button></div>
+          </div>
+
+          <div style="margin-top: 18px; text-align: center; color: var(--slate-500); font-size: .84rem;">
+            Or try a sample leaf:
+            <span style="display: inline-flex; gap: 8px; margin-left: 8px; flex-wrap: wrap;">
+              <button class="btn btn-ghost btn-sm" style="color: var(--slate-700); border: 1.5px solid var(--slate-200); background: var(--white);" onclick="loadSample('tomato')">🍅 Tomato Blight</button>
+              <button class="btn btn-ghost btn-sm" style="color: var(--slate-700); border: 1.5px solid var(--slate-200); background: var(--white);" onclick="loadSample('wheat')">🌾 Wheat Healthy</button>
+              <button class="btn btn-ghost btn-sm" style="color: var(--slate-700); border: 1.5px solid var(--slate-200); background: var(--white);" onclick="loadSample('potato')">🥔 Potato Late Blight</button>
+              <button class="btn btn-ghost btn-sm" style="color: var(--slate-700); border: 1.5px solid var(--slate-200); background: var(--white);" onclick="loadSample('uncertain')">❓ Blurry Leaf</button>
+            </span>
+          </div>
+
+          <!-- Tips -->
+          <div class="upload-tips-grid">
+            <div class="upload-tip"><span style="font-size: 1.2rem;">💡</span><span><strong>Good Lighting:</strong> Capture in bright, natural light without harsh shadows.</span></div>
+            <div class="upload-tip"><span style="font-size: 1.2rem;">🔍</span><span><strong>One Leaf Only:</strong> Fill the frame with a single affected leaf, close-up.</span></div>
+            <div class="upload-tip"><span style="font-size: 1.2rem;">🚫</span><span><strong>No Filters:</strong> Avoid beauty filters, vignetting, or digital enhancements.</span></div>
+            <div class="upload-tip"><span style="font-size: 1.2rem;">🔄</span><span><strong>Both Sides:</strong> Check both top and bottom if symptoms differ.</span></div>
+          </div>
+        </div>
+
+        <!-- STEP 2: PREVIEW -->
+        <div id="detect-step-preview" style="display: none;">
+          <div class="preview-card">
+            <div class="preview-img-box">
+              <img id="preview-img" src="" alt="Selected leaf" />
+            </div>
+            <div style="margin-bottom: 16px;">
+              <div style="font-weight: 700; color: var(--slate-800); font-size: .92rem;" id="preview-filename">leaf-photo.jpg</div>
+              <div style="font-size: .78rem; color: var(--slate-400);" id="preview-filesize">JPG · 1.4 MB</div>
+            </div>
+            <div class="preview-actions">
+              <button class="btn-reupload" onclick="resetDetection()">← Choose Another</button>
+              <button class="btn-analyze" onclick="runAnalysis()">
+                <span>⚡ Run AI Analysis</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 2B: ANALYZING SPINNER -->
+        <div id="detect-step-analyzing" style="display: none;">
+          <div class="analyzing-card">
+            <div class="big-spinner"></div>
+            <div style="font-size: 1.2rem; font-weight: 800; color: var(--slate-900);">Analyzing Leaf Photograph…</div>
+            <div style="font-size: .88rem; color: var(--slate-500); margin-top: 4px;">Running EfficientNet inference on PlantVillage dataset</div>
+            <div class="analyzing-steps-list">
+              <div class="an-step done" id="an-s1"><div class="an-dot"></div><span>Validating image quality &amp; format</span></div>
+              <div class="an-step cur" id="an-s2"><div class="an-dot"></div><span>Running neural network inference</span></div>
+              <div class="an-step" id="an-s3"><div class="an-dot"></div><span>Checking confidence thresholds</span></div>
+              <div class="an-step" id="an-s4"><div class="an-dot"></div><span>Fetching verified agricultural remedies</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 3: RESULT -->
+        <div id="detect-step-result" style="display: none;">
+          <!-- Top card -->
+          <div class="result-top-card">
+            <div class="result-leaf" id="res-emoji">🍅</div>
+            <div style="flex: 1;">
+              <div class="result-label" id="res-disease-name">Early Blight</div>
+              <div class="result-crop-chip" id="res-crop-chip">🍅 Tomato • Solanum lycopersicum</div>
+              <div class="conf-row">
+                <div class="conf-num" id="res-conf-num">92%</div>
+                <div class="conf-bar-bg"><div class="conf-bar-fill" id="res-conf-bar" style="width: 92%;"></div></div>
+                <span class="pred-badge disease" id="res-badge">Disease</span>
+              </div>
+              <div class="conf-sub" id="res-conf-sub">High confidence prediction • Model v1.2</div>
+              <div class="result-ts" id="res-ts">Scanned just now • Saved to Prediction Logs</div>
+            </div>
+          </div>
+
+          <!-- Uncertainty notice if applicable -->
+          <div class="uncertainty-box" id="res-uncertain-box" style="display: none;">
+            <span style="font-size: 1.3rem;">⚠️</span>
+            <div>
+              <strong>Low-Confidence / Inconclusive Result</strong><br>
+              The model confidence score is below our safe decision threshold (60%). LeafGuard does not treat this as a confirmed diagnosis. Please retake the photograph in better lighting or consult a local Krishi Vigyan Kendra (KVK) officer.
+            </div>
+          </div>
+
+          <!-- Interpretation & Remedies -->
+          <div class="result-row">
+            <div class="result-card">
+              <div class="result-card-title">🔍 Visual Symptoms &amp; Interpretation</div>
+              <p id="res-desc">Concentric brown rings ("target-board" spots) surrounded by yellow chlorotic halos, typically beginning on older lower leaves. Caused by the fungal pathogen Alternaria solani.</p>
+            </div>
+            <div class="result-card">
+              <div class="result-card-title">🧠 Grad-CAM Explainability</div>
+              <div class="gradcam-box">
+                <span id="res-cam-emoji">🍃</span>
+                <div class="gradcam-heat"></div>
+              </div>
+              <div class="gradcam-label">Attention/activation heatmap: Red/amber zones contributed most to the prediction. Not biological proof.</div>
+            </div>
+          </div>
+
+          <!-- Practical guidance -->
+          <div class="result-card" style="margin-bottom: 14px;">
+            <div class="result-card-title">🌱 Practical Next Steps (Non-Chemical First)</div>
+            <ul class="remedy-list" id="res-remedy-list">
+              <li class="remedy-item"><div class="remedy-num">1</div><span>Immediately remove and safely destroy severely infected lower leaves. Do not compost them.</span></li>
+              <li class="remedy-item"><div class="remedy-num">2</div><span>Avoid overhead irrigation; water at the base of the plant to keep foliage dry.</span></li>
+              <li class="remedy-item"><div class="remedy-num">3</div><span>Apply organic mulch (straw or plastic) around the stem to prevent soil splashback.</span></li>
+              <li class="remedy-item"><div class="remedy-num">4</div><span>Ensure at least 60 cm spacing between plants for adequate air circulation.</span></li>
+            </ul>
+            <div class="source-row">
+              Source: ICAR - Indian Institute of Horticultural Research (IIHR) · Verified Guide (2025)
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+            <button class="new-scan-btn" onclick="resetDetection()">+ Scan Another Leaf</button>
+            <button class="btn btn-ghost btn-sm" style="color: var(--slate-700); border: 1.5px solid var(--slate-200); background: var(--white);" onclick="switchDashView('logs')">View in Logs →</button>
+            <div class="disclaimer" style="flex: 1; min-width: 280px;">
+              ⚠️ AI predictions can be wrong. Confirm serious cases with a local agricultural extension officer.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /view-detect -->
+
+    <!-- ===== VIEW: PREDICTION LOGS ===== -->
+    <div class="dash-view" id="view-logs">
+      <div class="view-header">
+        <h2>Prediction Logs 📋</h2>
+        <p>Complete searchable history of all leaf scans and AI diagnoses.</p>
+      </div>
+
+      <!-- Filters -->
+      <div class="logs-filters">
+        <div class="fgroup">
+          <label>Crop</label>
+          <select id="flt-crop" onchange="applyLogsFilters()">
+            <option value="">All Crops</option>
+            <option value="Tomato">Tomato</option>
+            <option value="Wheat">Wheat</option>
+            <option value="Potato">Potato</option>
+            <option value="Corn">Corn</option>
+            <option value="Pepper">Pepper</option>
+            <option value="Rice">Rice</option>
+          </select>
+        </div>
+        <div class="fgroup">
+          <label>Status</label>
+          <select id="flt-status" onchange="applyLogsFilters()">
+            <option value="">All Statuses</option>
+            <option value="Healthy">Healthy Only</option>
+            <option value="Disease">Disease Only</option>
+            <option value="Uncertain">Low Confidence / Uncertain</option>
+          </select>
+        </div>
+        <div class="fgroup">
+          <label>Min Confidence</label>
+          <select id="flt-conf" onchange="applyLogsFilters()">
+            <option value="0">Any Confidence</option>
+            <option value="80">&ge; 80%</option>
+            <option value="90">&ge; 90%</option>
+          </select>
+        </div>
+        <div class="fgroup">
+          <label>Search</label>
+          <input type="text" id="flt-search" placeholder="Filter by text…" oninput="applyLogsFilters()" />
+        </div>
+        <button class="btn-reset" onclick="resetLogsFilters()">Reset Filters</button>
+      </div>
+
+      <!-- Table -->
+      <div class="logs-wrap">
+        <table class="logs-table">
+          <thead>
+            <tr>
+              <th style="width: 50px;">Thumb</th>
+              <th>Crop</th>
+              <th>Diagnosis</th>
+              <th>Confidence</th>
+              <th>Status</th>
+              <th>Date &amp; Time</th>
+              <th style="text-align: right;">Action</th>
+            </tr>
+          </thead>
+          <tbody id="logs-tbody">
+            <!-- Populated by JS -->
+          </tbody>
+        </table>
+        <div class="logs-footer">
+          <div id="logs-count-text">Showing 5 of 24 records</div>
+          <div class="pg-btns">
+            <button class="pg-btn active">1</button>
+            <button class="pg-btn">2</button>
+            <button class="pg-btn">3</button>
+            <button class="pg-btn">&gt;</button>
+          </div>
+        </div>
+      </div>
+    </div><!-- /view-logs -->
+
+    <!-- ===== VIEW: MODEL INFO ===== -->
+    <div class="dash-view" id="view-model">
+      <div class="view-header">
+        <h2>Model &amp; Dataset Transparency 🧠</h2>
+        <p>Documenting model architecture, validation performance, limitations, and supported classes.</p>
+      </div>
+
+      <div class="model-status-row">
+        <div class="status-pill"><div class="dot"></div> Model: EfficientNet-B0 fine-tuned</div>
+        <div class="status-pill">Dataset: PlantVillage (54,303 images)</div>
+        <div class="status-pill">Overall Accuracy: 95.4% (Held-Out Test Set)</div>
+        <div class="status-pill">Abstention Threshold: 60.0%</div>
+      </div>
+
+      <div class="model-layout">
+        <!-- Left: Metrics table -->
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Evaluation Metrics (Held-Out Test Split)</span>
+              <span style="font-size: .75rem; color: var(--green-600); font-weight: 700;">80/10/10 Stratified Split</span>
+            </div>
+            <table class="metric-tbl">
+              <thead>
+                <tr>
+                  <th>Metric</th>
+                  <th>Score</th>
+                  <th style="width: 140px;">Visual</th>
+                  <th>Benchmark Target</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Overall Accuracy</td>
+                  <td class="mv">95.4%</td>
+                  <td><div class="mbar-wrap"><div class="mbar"><div class="mbar-fill" style="width: 95.4%;"></div></div></div></td>
+                  <td style="color: var(--slate-500); font-size: .78rem;">&ge; 90%</td>
+                </tr>
+                <tr>
+                  <td>Macro Precision</td>
+                  <td class="mv">94.8%</td>
+                  <td><div class="mbar-wrap"><div class="mbar"><div class="mbar-fill" style="width: 94.8%;"></div></div></div></td>
+                  <td style="color: var(--slate-500); font-size: .78rem;">&ge; 88%</td>
+                </tr>
+                <tr>
+                  <td>Macro Recall</td>
+                  <td class="mv">94.1%</td>
+                  <td><div class="mbar-wrap"><div class="mbar"><div class="mbar-fill" style="width: 94.1%;"></div></div></div></td>
+                  <td style="color: var(--slate-500); font-size: .78rem;">&ge; 88%</td>
+                </tr>
+                <tr>
+                  <td>Macro F1-Score</td>
+                  <td class="mv">94.4%</td>
+                  <td><div class="mbar-wrap"><div class="mbar"><div class="mbar-fill" style="width: 94.4%;"></div></div></div></td>
+                  <td style="color: var(--slate-500); font-size: .78rem;">&ge; 88%</td>
+                </tr>
+                <tr>
+                  <td>Inference Latency</td>
+                  <td class="mv">180 ms</td>
+                  <td><div class="mbar-wrap"><div class="mbar"><div class="mbar-fill" style="width: 85%;"></div></div></div></td>
+                  <td style="color: var(--slate-500); font-size: .78rem;">&lt; 500 ms</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Training history curve -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Training &amp; Validation Accuracy (30 Epochs)</span>
+            </div>
+            <div class="curve-area">
+              <svg viewBox="0 0 400 100" preserveAspectRatio="none">
+                <!-- Grid lines -->
+                <line x1="0" y1="25" x2="400" y2="25" stroke="#e2e8f0" stroke-width="1" />
+                <line x1="0" y1="50" x2="400" y2="50" stroke="#e2e8f0" stroke-width="1" />
+                <line x1="0" y1="75" x2="400" y2="75" stroke="#e2e8f0" stroke-width="1" />
+                <!-- Train acc (green) -->
+                <path d="M0,85 C60,65 120,40 180,28 C240,20 320,14 400,10" fill="none" stroke="#22c55e" stroke-width="2.5" />
+                <!-- Val acc (blue) -->
+                <path d="M0,88 C60,70 120,48 180,35 C240,28 320,24 400,20" fill="none" stroke="#3b82f6" stroke-width="2.5" stroke-dasharray="4,2" />
+              </svg>
+            </div>
+            <div style="display: flex; gap: 16px; margin-top: 8px;">
+              <div style="display: flex; align-items: center; gap: 6px; font-size: .78rem; color: var(--slate-600);">
+                <div style="width: 16px; height: 3px; background: #22c55e;"></div> Training Accuracy (Final: 98.2%)
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px; font-size: .78rem; color: var(--slate-600);">
+                <div style="width: 16px; height: 3px; background: #3b82f6; border-top: 1px dashed #3b82f6;"></div> Validation Accuracy (Final: 95.4%)
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Limitations & Supported classes -->
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+          <!-- Known limitations (PRD requirement) -->
+          <div class="card">
+            <div class="card-title" style="margin-bottom: 12px;">Known Limitations &amp; Risks</div>
+            <div style="display: flex; flex-direction: column; gap: 10px; font-size: .84rem; color: var(--slate-700);">
+              <div style="padding: 10px; background: var(--amber-100); border-radius: var(--radius-sm); color: #78350f;">
+                <strong>Dataset Bias:</strong> PlantVillage images were captured under controlled laboratory lighting. Field-condition accuracy may differ.
+              </div>
+              <div style="padding: 10px; background: var(--slate-100); border-radius: var(--radius-sm);">
+                <strong>Abstention Policy:</strong> Predictions below 60% confidence are marked "Inconclusive" to prevent false certainty.
+              </div>
+              <div style="padding: 10px; background: var(--slate-100); border-radius: var(--radius-sm);">
+                <strong>No Chemical Prescriptions:</strong> Only general cultural and non-chemical practices are suggested without extension officer sign-off.
+              </div>
+            </div>
+          </div>
+
+          <!-- Supported Classes -->
+          <div class="card">
+            <div class="card-title" style="margin-bottom: 12px;">Supported Classes (MVP Subset)</div>
+            <div class="class-tags">
+              <span class="ctag d">🍅 Tomato Early Blight</span>
+              <span class="ctag d">🍅 Tomato Late Blight</span>
+              <span class="ctag d">🍅 Tomato Leaf Mold</span>
+              <span class="ctag h">🍅 Tomato Healthy</span>
+              <span class="ctag d">🥔 Potato Early Blight</span>
+              <span class="ctag d">🥔 Potato Late Blight</span>
+              <span class="ctag h">🥔 Potato Healthy</span>
+              <span class="ctag d">🌽 Corn Common Rust</span>
+              <span class="ctag d">🌽 Corn Northern Blight</span>
+              <span class="ctag h">🌽 Corn Healthy</span>
+              <span class="ctag d">🌾 Wheat Leaf Rust</span>
+              <span class="ctag h">🌾 Wheat Healthy</span>
+              <span class="ctag d">🫑 Pepper Bacterial Spot</span>
+              <span class="ctag h">🫑 Pepper Healthy</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /view-model -->
+
+    <!-- ===== VIEW: SETTINGS ===== -->
+    <div class="dash-view" id="view-settings">
+      <div class="view-header">
+        <h2>Account &amp; Platform Settings ⚙️</h2>
+        <p>Manage your personal profile, interface language, and account session.</p>
+      </div>
+
+      <div class="settings-layout">
+        <!-- Settings Nav -->
+        <div class="settings-sidebar">
+          <div class="stab active" id="stab-profile" onclick="switchSettingsTab('profile')">👤 Profile Details</div>
+          <div class="stab" id="stab-lang" onclick="switchSettingsTab('lang')">🌐 Language</div>
+          <div class="stab" id="stab-privacy" onclick="switchSettingsTab('privacy')">🔒 Privacy &amp; Data</div>
+        </div>
+
+        <!-- Panel: Profile -->
+        <div class="spanel active" id="spanel-profile">
+          <div class="card">
+            <div class="stitle">Profile Information</div>
+            <div class="avatar-row">
+              <div class="big-av" id="settings-big-av">R</div>
+              <div>
+                <button class="btn btn-green btn-sm" onclick="showToast('info', '📸 Profile photo upload will connect to Supabase storage.')">Change Photo</button>
+                <div style="font-size: .75rem; color: var(--slate-400); margin-top: 6px;">JPG, PNG up to 2MB</div>
+              </div>
+            </div>
+            <div class="sform">
+              <div class="sform-row">
+                <div class="fgrp">
+                  <label>First Name</label>
+                  <input type="text" id="set-fname" value="Rajesh" />
+                </div>
+                <div class="fgrp">
+                  <label>Last Name</label>
+                  <input type="text" id="set-lname" value="Kumar" />
+                </div>
+              </div>
+              <div class="fgrp">
+                <label>Email Address</label>
+                <input type="email" id="set-email" value="rajesh.kumar@agrifarm.in" />
+              </div>
+              <div class="fgrp">
+                <label>Primary Role</label>
+                <select id="set-role">
+                  <option value="Farmer" selected>Farmer / Agri-worker</option>
+                  <option value="Researcher">Agricultural Researcher / Student</option>
+                  <option value="Officer">KVK Extension Officer</option>
+                </select>
+              </div>
+              <div class="fgrp">
+                <label>Location / Region</label>
+                <input type="text" id="set-location" value="Patna, Bihar, India" />
+              </div>
+              <div style="display: flex; justify-content: flex-end; margin-top: 18px;">
+                <button class="btn-save" onclick="saveProfile()">Save Changes</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel: Language -->
+        <div class="spanel" id="spanel-lang">
+          <div class="card">
+            <div class="stitle">Preferred Interface Language</div>
+            <p style="font-size: .86rem; color: var(--slate-500); margin-bottom: 18px;">
+              Choose the language for the dashboard, disease explanations, and guidance.
+            </p>
+            <div class="lang-opts">
+              <div class="lang-opt sel" id="lopt-en" onclick="selectLang('en')">
+                <span class="lang-flag">🇬🇧</span>
+                <div>
+                  <div class="lang-name">English</div>
+                  <div class="lang-native">Default interface language</div>
+                </div>
+                <span class="lang-chk">✓</span>
+              </div>
+              <div class="lang-opt" id="lopt-hi" onclick="selectLang('hi')">
+                <span class="lang-flag">🇮🇳</span>
+                <div>
+                  <div class="lang-name">हिन्दी (Hindi)</div>
+                  <div class="lang-native">भारतीय किसानों के लिए पूर्ण अनुवाद</div>
+                </div>
+                <span class="lang-chk">✓</span>
+              </div>
+              <div class="lang-opt" id="lopt-bn" onclick="selectLang('bn')">
+                <span class="lang-flag">🇧🇩</span>
+                <div>
+                  <div class="lang-name">বাংলা (Bengali)</div>
+                  <div class="lang-native">পশ্চিমবঙ্গ ও বাংলাদেশের কৃষকদের জন্য</div>
+                </div>
+                <span class="lang-chk">✓</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel: Privacy -->
+        <div class="spanel" id="spanel-privacy">
+          <div class="card">
+            <div class="stitle">Privacy &amp; Data Governance</div>
+            <div style="font-size: .86rem; color: var(--slate-700); line-height: 1.65; margin-bottom: 20px;">
+              LeafGuard stores your uploaded leaf photographs and prediction metadata in secure Supabase storage with Row-Level Security (RLS). Images are retained for your history and model retraining (if opted in).
+            </div>
+            <div class="danger-box">
+              <div class="danger-title">Danger Zone</div>
+              <div class="danger-row">
+                <div>
+                  <div class="danger-row-label">Clear Prediction History</div>
+                  <div class="danger-row-sub">Permanently delete all 24 past scans from your account</div>
+                </div>
+                <button class="btn-danger" onclick="clearAllLogs()">Clear History</button>
+              </div>
+              <div class="danger-row">
+                <div>
+                  <div class="danger-row-label">Delete Account</div>
+                  <div class="danger-row-sub">Delete your profile and all stored scan data permanently</div>
+                </div>
+                <button class="btn-danger" onclick="deleteAccount()">Delete Account</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /view-settings -->
+
+  </div><!-- /dash-main -->
+</div><!-- /dashboard -->
+
+
+<!-- ==================== FORGOT PASSWORD MODAL ==================== -->
+<div class="modal-overlay" id="forgot-modal" onclick="closeForgotOnBg(event)">
+  <div class="modal">
+    <h3>Reset Password 🔑</h3>
+    <p>Enter your email and we'll send you a secure reset link. Check your inbox within 2 minutes.</p>
+    <div class="form-group">
+      <label>Email Address</label>
+      <input type="email" id="forgot-email" placeholder="you@example.com" />
+      <div class="field-error" id="forgot-err">Please enter a valid email address.</div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeForgot()">Cancel</button>
+      <button class="btn-modal-submit" onclick="handleForgot()">Send Reset Link</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== TOAST CONTAINER ==================== -->
+<div class="toast-container" id="toast-container"></div>
+
+
+<!-- ==================== JAVASCRIPT ==================== -->
+<script>
+  /* ======================================================
+     GLOBAL STATE & MOCK DATA
+  ====================================================== */
+  let currentUser = {
+    email: 'rajesh.kumar@agrifarm.in',
+    name: 'Rajesh Kumar',
+    firstName: 'Rajesh',
+    role: 'Farmer'
+  };
+
+  const sampleScans = [
+    { id: 1, crop: 'Tomato', disease: 'Early Blight (Alternaria solani)', emoji: '🍅', conf: 92, status: 'Disease', date: 'Today, 2:34 PM', desc: 'Target-board concentric rings with yellow halo on lower leaves.', remedy: ['Remove affected lower leaves', 'Water at base to keep leaves dry', 'Ensure 60cm spacing'] },
+    { id: 2, crop: 'Wheat', disease: 'Healthy Plant', emoji: '🌾', conf: 98, status: 'Healthy', date: 'Today, 11:12 AM', desc: 'No signs of fungal rust or viral mosaic detected.', remedy: ['Continue normal watering & monitoring'] },
+    { id: 3, crop: 'Potato', disease: 'Late Blight (P. infestans)', emoji: '🥔', conf: 88, status: 'Disease', date: 'Yesterday, 4:20 PM', desc: 'Water-soaked irregular dark lesions turning brown/black.', remedy: ['Destroy infected plants immediately', 'Avoid sprinkler irrigation'] },
+    { id: 4, crop: 'Corn', disease: 'Northern Leaf Blight', emoji: '🌽', conf: 79, status: 'Disease', date: 'Yesterday, 9:05 AM', desc: 'Long elliptical grayish-green or tan lesions.', remedy: ['Practice 2-year crop rotation', 'Select resistant hybrids'] },
+    { id: 5, crop: 'Pepper', disease: 'Bacterial Spot', emoji: '🫑', conf: 54, status: 'Uncertain', date: '2 days ago', desc: 'Low confidence estimate. Blurry image or ambiguous symptom.', remedy: ['Retake photo in clear lighting', 'Consult local extension officer'] },
+    { id: 6, crop: 'Rice', disease: 'Blast Disease (Magnaporthe)', emoji: '🌾', conf: 91, status: 'Disease', date: '3 days ago', desc: 'Diamond/spindle shaped lesions with gray center.', remedy: ['Avoid excessive nitrogen fertilizer', 'Keep field water managed'] }
+  ];
+
+  let currentLogs = [...sampleScans];
+  let currentFile = null;
+
+  /* ======================================================
+     PAGE SYSTEM
+  ====================================================== */
+  function showPage(name) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-' + name).classList.add('active');
+    window.scrollTo(0, 0);
+  }
+
+  function showAuth(tab) {
+    showPage('auth');
+    switchTab(tab);
+  }
+
+  function scrollToSection(id) {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  /* ======================================================
+     AUTH TABS
+  ====================================================== */
+  function switchTab(tab) {
+    document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+    document.getElementById('tab-' + tab).classList.add('active');
+    document.getElementById('form-' + tab).classList.add('active');
+    hideAlerts();
+  }
+
+  function togglePassword(inputId, btn) {
+    const input = document.getElementById(inputId);
+    if (input.type === 'password') {
+      input.type = 'text'; btn.textContent = '🙈';
+    } else {
+      input.type = 'password'; btn.textContent = '👁️';
+    }
+  }
+
+  function checkStrength(val) {
+    const fill = document.getElementById('strength-fill');
+    const text = document.getElementById('strength-text');
+    let score = 0;
+    if (val.length >= 8) score++;
+    if (/[A-Z]/.test(val)) score++;
+    if (/[0-9]/.test(val)) score++;
+    if (/[^A-Za-z0-9]/.test(val)) score++;
+
+    const levels = [
+      { w: '0%', bg: 'transparent', t: 'Enter a password' },
+      { w: '25%', bg: '#ef4444', t: 'Weak' },
+      { w: '50%', bg: '#f59e0b', t: 'Fair' },
+      { w: '75%', bg: '#3b82f6', t: 'Good' },
+      { w: '100%', bg: '#22c55e', t: 'Strong ✓' },
+    ];
+    const lvl = val.length === 0 ? levels[0] : levels[Math.min(score, 4)];
+    fill.style.width = lvl.w; fill.style.background = lvl.bg;
+    text.textContent = lvl.t; text.style.color = lvl.bg;
+  }
+
+  function markErr(inputId, errId, show) {
+    const inp = document.getElementById(inputId);
+    const err = document.getElementById(errId);
+    if (inp) inp.classList.toggle('error', show);
+    if (err) err.classList.toggle('show', show);
+  }
+
+  function isEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+  function hideAlerts() {
+    document.getElementById('auth-alert-success').classList.remove('show');
+    document.getElementById('auth-alert-error').classList.remove('show');
+  }
+
+  function setLoading(btnId, spinnerId, textId, loading, label) {
+    const btn = document.getElementById(btnId);
+    const spinner = document.getElementById(spinnerId);
+    const text = document.getElementById(textId);
+    btn.disabled = loading;
+    spinner.classList.toggle('show', loading);
+    text.textContent = loading ? 'Please wait…' : label;
+  }
+
+  function handleSignIn() {
+    hideAlerts();
+    const email = document.getElementById('signin-email').value.trim();
+    const pass  = document.getElementById('signin-password').value;
+
+    let valid = true;
+    markErr('signin-email', 'signin-email-err', !isEmail(email));
+    if (!isEmail(email)) valid = false;
+    markErr('signin-password', 'signin-pass-err', !pass);
+    if (!pass) valid = false;
+    if (!valid) return;
+
+    setLoading('signin-btn', 'signin-spinner', 'signin-btn-text', true, 'Sign In to LeafGuard');
+    setTimeout(() => {
+      setLoading('signin-btn', 'signin-spinner', 'signin-btn-text', false, 'Sign In to LeafGuard');
+      currentUser = { email, name: 'Rajesh Kumar', firstName: 'Rajesh', role: 'Farmer' };
+      showDashboard();
+      showToast('success', '✅ Signed in successfully!');
+    }, 1200);
+  }
+
+  function handleSignUp() {
+    hideAlerts();
+    const fname = document.getElementById('signup-fname').value.trim();
+    const lname = document.getElementById('signup-lname').value.trim();
+    const email = document.getElementById('signup-email').value.trim();
+    const role  = document.getElementById('signup-role').value;
+    const pass  = document.getElementById('signup-password').value;
+    const confirm = document.getElementById('signup-confirm').value;
+    const terms = document.getElementById('agree-terms').checked;
+
+    let valid = true;
+    markErr('signup-fname', 'signup-fname-err', !fname); if (!fname) valid = false;
+    markErr('signup-lname', 'signup-lname-err', !lname); if (!lname) valid = false;
+    markErr('signup-email', 'signup-email-err', !isEmail(email)); if (!isEmail(email)) valid = false;
+    markErr('signup-role',  'signup-role-err',  !role); if (!role) valid = false;
+    markErr('signup-password', 'signup-pass-err', pass.length < 8); if (pass.length < 8) valid = false;
+    markErr('signup-confirm',  'signup-confirm-err', pass !== confirm); if (pass !== confirm) valid = false;
+
+    document.getElementById('signup-terms-err').classList.toggle('show', !terms);
+    if (!terms) valid = false;
+    if (!valid) return;
+
+    setLoading('signup-btn', 'signup-spinner', 'signup-btn-text', true, 'Create Free Account');
+    setTimeout(() => {
+      setLoading('signup-btn', 'signup-spinner', 'signup-btn-text', false, 'Create Free Account');
+      currentUser = {
+        email, name: fname + ' ' + lname, firstName: fname,
+        role: document.getElementById('signup-role').options[document.getElementById('signup-role').selectedIndex].text
+      };
+      showDashboard();
+      showToast('success', '🎉 Welcome to LeafGuard, ' + fname + '!');
+    }, 1400);
+  }
+
+  function handleSignOut() {
+    currentUser = null;
+    showPage('landing');
+    showToast('info', '👋 You have signed out.');
+  }
+
+  /* ======================================================
+     DASHBOARD & SIDEBAR NAVIGATION
+  ====================================================== */
+  const viewTitles = {
+    home:     { title: 'Dashboard Overview', breadcrumb: 'LeafGuard > Dashboard' },
+    detect:   { title: 'Detect Plant Disease', breadcrumb: 'LeafGuard > Detect Disease' },
+    logs:     { title: 'Prediction Logs', breadcrumb: 'LeafGuard > Logs' },
+    model:    { title: 'Model & Dataset Transparency', breadcrumb: 'LeafGuard > Model Info' },
+    settings: { title: 'Account Settings', breadcrumb: 'LeafGuard > Settings' }
+  };
+
+  function switchDashView(vName) {
+    // Nav highlight
+    document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+    const item = document.getElementById('sitem-' + vName);
+    if (item) item.classList.add('active');
+
+    // Views
+    document.querySelectorAll('.dash-view').forEach(v => v.classList.remove('active'));
+    const view = document.getElementById('view-' + vName);
+    if (view) view.classList.add('active');
+
+    // Header info
+    if (viewTitles[vName]) {
+      document.getElementById('topbar-title').textContent = viewTitles[vName].title;
+      document.getElementById('topbar-breadcrumb').textContent = viewTitles[vName].breadcrumb;
+    }
+
+    if (vName === 'logs') renderLogsTable(currentLogs);
+    if (vName === 'home') { renderHomePredictions(); renderChart(); }
+  }
+
+  function showDashboard() {
+    if (currentUser) {
+      document.getElementById('dash-username').textContent = currentUser.name;
+      document.getElementById('dash-first-name').textContent = currentUser.firstName;
+      document.getElementById('dash-role').textContent = currentUser.role;
+      document.getElementById('dash-avatar').textContent = currentUser.firstName[0].toUpperCase();
+      document.getElementById('settings-big-av').textContent = currentUser.firstName[0].toUpperCase();
+      document.getElementById('set-fname').value = currentUser.firstName;
+      document.getElementById('set-email').value = currentUser.email;
+
+      const now = new Date();
+      document.getElementById('dash-date').textContent = now.toLocaleDateString('en-IN', {
+        weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+      }) + ' — Here is your crop health summary';
+    }
+    showPage('dashboard');
+    switchDashView('home');
+  }
+
+  /* ======================================================
+     HOME VIEW RENDERING
+  ====================================================== */
+  function renderHomePredictions() {
+    const list = document.getElementById('home-pred-list');
+    list.innerHTML = '';
+    sampleScans.slice(0, 5).forEach(s => {
+      const badgeCls = s.status === 'Healthy' ? 'healthy' : (s.status === 'Disease' ? 'disease' : 'uncertain');
+      const item = document.createElement('div');
+      item.className = 'prediction-item';
+      item.innerHTML = `
+        <div class="pred-thumb">${s.emoji}</div>
+        <div style="flex: 1;">
+          <div class="pred-crop">${s.crop}</div>
+          <div class="pred-disease">${s.disease}</div>
+          <div class="pred-time">${s.date}</div>
+        </div>
+        <span class="pred-badge ${badgeCls}">${s.status}</span>
+        <div class="pred-conf">${s.conf}%</div>
+      `;
+      list.appendChild(item);
+    });
+  }
+
+  function renderChart() {
+    const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    const data = [
+      { h: 2, d: 1, u: 0 },
+      { h: 1, d: 2, u: 1 },
+      { h: 3, d: 0, u: 0 },
+      { h: 2, d: 1, u: 0 },
+      { h: 1, d: 2, u: 0 },
+      { h: 2, d: 1, u: 1 },
+      { h: 2, d: 1, u: 0 },
+    ];
+    const max = 5;
+    const container = document.getElementById('chart-bars');
+    container.innerHTML = '';
+
+    data.forEach((d, i) => {
+      const col = document.createElement('div');
+      col.className = 'bar-col';
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'display:flex;flex-direction:column;justify-content:flex-end;height:70px;gap:2px;width:100%;';
+
+      [[d.d, 'disease'],[d.u, 'uncertain'],[d.h, '']].forEach(([val, cls]) => {
+        if (val > 0) {
+          const bar = document.createElement('div');
+          bar.className = 'bar' + (cls ? ' ' + cls : '');
+          bar.style.height = (val / max * 55) + 'px';
+          wrap.appendChild(bar);
+        }
+      });
+
+      const label = document.createElement('div');
+      label.className = 'bar-label';
+      label.textContent = days[i];
+      col.appendChild(wrap);
+      col.appendChild(label);
+      container.appendChild(col);
+    });
+  }
+
+  /* ======================================================
+     DETECT DISEASE WORKFLOW
+  ====================================================== */
+  function handleFileSelect(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (!['image/jpeg', 'image/png'].includes(file.type)) {
+      showToast('error', '❌ Please upload a JPG or PNG image.');
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      showToast('error', '❌ Image must be under 10 MB.');
+      return;
+    }
+    currentFile = file;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      document.getElementById('preview-img').src = ev.target.result;
+      document.getElementById('preview-filename').textContent = file.name;
+      document.getElementById('preview-filesize').textContent = file.type.toUpperCase().replace('IMAGE/', '') + ' · ' + (file.size / 1024 / 1024).toFixed(2) + ' MB';
+      showDetectStep('preview');
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function loadSample(type) {
+    const samples = {
+      tomato: {
+        name: 'tomato_early_blight.jpg', size: '1.2 MB', emoji: '🍅',
+        label: 'Early Blight (Alternaria solani)', crop: 'Tomato • Solanum lycopersicum',
+        conf: 92, badge: 'Disease', badgeCls: 'disease', uncertain: false,
+        desc: 'Concentric brown rings with yellow chlorotic halos on lower leaves. Caused by Alternaria solani.',
+        remedy: [
+          'Remove and destroy infected lower leaves. Do not compost.',
+          'Water at plant base to prevent wet leaves.',
+          'Apply organic mulch to stop soil splashback.',
+          'Ensure 60cm plant spacing for air circulation.'
+        ]
+      },
+      wheat: {
+        name: 'wheat_healthy.jpg', size: '0.9 MB', emoji: '🌾',
+        label: 'Healthy Wheat Leaf', crop: 'Wheat • Triticum aestivum',
+        conf: 98, badge: 'Healthy', badgeCls: 'healthy', uncertain: false,
+        desc: 'No signs of leaf rust, powdery mildew, or viral discoloration detected.',
+        remedy: [
+          'Maintain regular irrigation schedule.',
+          'Continue scouting for aphids or early rust symptoms weekly.'
+        ]
+      },
+      potato: {
+        name: 'potato_late_blight.jpg', size: '1.5 MB', emoji: '🥔',
+        label: 'Late Blight (Phytophthora infestans)', crop: 'Potato • Solanum tuberosum',
+        conf: 88, badge: 'Disease', badgeCls: 'disease', uncertain: false,
+        desc: 'Dark water-soaked lesions spreading rapidly in humid conditions. High risk of crop loss.',
+        remedy: [
+          'Immediately rogue out and destroy severely affected vines.',
+          'Cease overhead sprinkler watering.',
+          'Consult local KVK for verified preventive bio-fungicide options.'
+        ]
+      },
+      uncertain: {
+        name: 'blurry_leaf_sample.jpg', size: '0.6 MB', emoji: '❓',
+        label: 'Inconclusive Result', crop: 'Unknown Crop',
+        conf: 43, badge: 'Low Confidence', badgeCls: 'uncertain', uncertain: true,
+        desc: 'Image quality is too low or leaf symptoms do not match our trained classes.',
+        remedy: [
+          'Retake photo with good natural light and focus on one leaf.',
+          'Take sample to your local agricultural extension service (KVK).'
+        ]
+      }
+    };
+
+    const s = samples[type];
+    currentSample = s;
+    document.getElementById('preview-filename').textContent = s.name;
+    document.getElementById('preview-filesize').textContent = 'JPG · ' + s.size;
+    // Emoji canvas as image
+    const canvas = document.createElement('canvas');
+    canvas.width = 300; canvas.height = 200;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#f0fdf4'; ctx.fillRect(0, 0, 300, 200);
+    ctx.font = '72px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(s.emoji, 150, 100);
+    document.getElementById('preview-img').src = canvas.toDataURL();
+    showDetectStep('preview');
+  }
+
+  function showDetectStep(step) {
+    document.getElementById('detect-step-upload').style.display = step === 'upload' ? 'block' : 'none';
+    document.getElementById('detect-step-preview').style.display = step === 'preview' ? 'block' : 'none';
+    document.getElementById('detect-step-analyzing').style.display = step === 'analyzing' ? 'block' : 'none';
+    document.getElementById('detect-step-result').style.display = step === 'result' ? 'block' : 'none';
+
+    // Step bar
+    const s1 = document.getElementById('ds-1');
+    const s2 = document.getElementById('ds-2');
+    const s3 = document.getElementById('ds-3');
+    const l1 = document.getElementById('dsl-1');
+    const l2 = document.getElementById('dsl-2');
+
+    [s1, s2, s3].forEach(s => { s.classList.remove('active', 'done'); });
+    [l1, l2].forEach(l => l.classList.remove('done'));
+
+    if (step === 'upload') { s1.classList.add('active'); }
+    if (step === 'preview') { s1.classList.add('done'); l1.classList.add('done'); s2.classList.add('active'); }
+    if (step === 'analyzing') { s1.classList.add('done'); l1.classList.add('done'); s2.classList.add('done'); l2.classList.add('done'); s3.classList.add('active'); }
+    if (step === 'result') { s1.classList.add('done'); l1.classList.add('done'); s2.classList.add('done'); l2.classList.add('done'); s3.classList.add('done'); }
+  }
+
+  function runAnalysis() {
+    showDetectStep('analyzing');
+    // Animate the pipeline steps
+    const steps = ['an-s1', 'an-s2', 'an-s3', 'an-s4'];
+    let idx = 0;
+    const timer = setInterval(() => {
+      if (idx < steps.length) {
+        document.getElementById(steps[idx]).className = 'an-step done';
+        idx++;
+        if (idx < steps.length) {
+          document.getElementById(steps[idx]).className = 'an-step cur';
+        }
+      } else {
+        clearInterval(timer);
+        displayResult();
+      }
+    }, 550);
+  }
+
+  function displayResult() {
+    const s = window.currentSample || {
+      emoji: '🍅', label: 'Early Blight (Alternaria solani)',
+      crop: 'Tomato • Solanum lycopersicum', conf: 92,
+      badge: 'Disease', badgeCls: 'disease', uncertain: false,
+      desc: 'Concentric brown rings with yellow chlorotic halos on lower leaves. Caused by Alternaria solani.',
+      remedy: [
+        'Remove and destroy infected lower leaves. Do not compost.',
+        'Water at plant base to prevent wet leaves.',
+        'Apply organic mulch to stop soil splashback.',
+        'Ensure 60cm plant spacing for air circulation.'
+      ]
+    };
+
+    document.getElementById('res-emoji').textContent = s.emoji;
+    document.getElementById('res-cam-emoji').textContent = s.emoji;
+    document.getElementById('res-disease-name').textContent = s.label;
+    document.getElementById('res-crop-chip').textContent = s.crop;
+    document.getElementById('res-conf-num').textContent = s.conf + '%';
+    document.getElementById('res-conf-bar').style.width = s.conf + '%';
+    document.getElementById('res-badge').className = 'pred-badge ' + s.badgeCls;
+    document.getElementById('res-badge').textContent = s.badge;
+    document.getElementById('res-desc').textContent = s.desc;
+
+    // Uncertainty toggle
+    document.getElementById('res-uncertain-box').style.display = s.uncertain ? 'flex' : 'none';
+
+    // Populate remedies
+    const list = document.getElementById('res-remedy-list');
+    list.innerHTML = '';
+    s.remedy.forEach((r, i) => {
+      const li = document.createElement('li');
+      li.className = 'remedy-item';
+      li.innerHTML = `<div class="remedy-num">${i + 1}</div><span>${r}</span>`;
+      list.appendChild(li);
+    });
+
+    // Add to logs
+    const newLog = {
+      id: Date.now(),
+      crop: s.crop.split('•')[0].trim().replace(/[^a-zA-Z]/g, ''),
+      disease: s.label,
+      emoji: s.emoji,
+      conf: s.conf,
+      status: s.badge,
+      date: 'Just now',
+      desc: s.desc,
+      remedy: s.remedy
+    };
+    currentLogs.unshift(newLog);
+    document.getElementById('logs-badge').textContent = currentLogs.length;
+    document.getElementById('kpi-total').textContent = currentLogs.length;
+
+    showDetectStep('result');
+    showToast('success', '✅ Analysis complete: ' + s.label + ' (' + s.conf + '%)');
+  }
+
+  function resetDetection() {
+    currentFile = null;
+    window.currentSample = null;
+    document.getElementById('leaf-file-input').value = '';
+    showDetectStep('upload');
+  }
+
+  /* ======================================================
+     PREDICTION LOGS TABLE
+  ====================================================== */
+  function renderLogsTable(logs) {
+    const tbody = document.getElementById('logs-tbody');
+    tbody.innerHTML = '';
+    if (logs.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--slate-400); padding: 32px;">No matching records found. Try adjusting your filters.</td></tr>`;
+      document.getElementById('logs-count-text').textContent = 'Showing 0 records';
+      return;
+    }
+    logs.forEach(l => {
+      const tr = document.createElement('tr');
+      const pillCls = l.conf >= 85 ? 'high' : (l.conf >= 60 ? 'mid' : 'low');
+      const statusBadge = l.status === 'Healthy' ? '<span class="pred-badge healthy">Healthy</span>' : (l.status === 'Disease' ? '<span class="pred-badge disease">Disease</span>' : '<span class="pred-badge uncertain">Uncertain</span>');
+      tr.innerHTML = `
+        <td><div class="log-thumb">${l.emoji}</div></td>
+        <td><span class="log-crop-name">${l.crop}</span></td>
+        <td>
+          <div style="font-weight: 600; color: var(--slate-800); font-size: .86rem;">${l.disease}</div>
+          <div class="log-disease-name">${l.desc ? l.desc.slice(0, 45) + '…' : ''}</div>
+        </td>
+        <td><span class="cpill ${pillCls}">${l.conf}%</span></td>
+        <td>${statusBadge}</td>
+        <td style="font-size: .8rem; color: var(--slate-500);">${l.date}</td>
+        <td style="text-align: right;">
+          <button class="btn-vlog" onclick="viewLogDetail(${l.id})">Details</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+    document.getElementById('logs-count-text').textContent = `Showing ${logs.length} of ${sampleScans.length} records`;
+  }
+
+  function applyLogsFilters() {
+    const crop = document.getElementById('flt-crop').value.toLowerCase();
+    const status = document.getElementById('flt-status').value.toLowerCase();
+    const minConf = parseInt(document.getElementById('flt-conf').value) || 0;
+    const search = document.getElementById('flt-search').value.toLowerCase().trim();
+
+    const filtered = currentLogs.filter(l => {
+      if (crop && !l.crop.toLowerCase().includes(crop)) return false;
+      if (status && !l.status.toLowerCase().includes(status)) return false;
+      if (l.conf < minConf) return false;
+      if (search && !l.crop.toLowerCase().includes(search) && !l.disease.toLowerCase().includes(search)) return false;
+      return true;
+    });
+    renderLogsTable(filtered);
+  }
+
+  function resetLogsFilters() {
+    document.getElementById('flt-crop').value = '';
+    document.getElementById('flt-status').value = '';
+    document.getElementById('flt-conf').value = '0';
+    document.getElementById('flt-search').value = '';
+    renderLogsTable(currentLogs);
+  }
+
+  function viewLogDetail(id) {
+    const log = currentLogs.find(l => l.id === id);
+    if (!log) return;
+    window.currentSample = {
+      emoji: log.emoji, label: log.disease,
+      crop: log.crop, conf: log.conf,
+      badge: log.status, badgeCls: log.status === 'Healthy' ? 'healthy' : (log.status === 'Disease' ? 'disease' : 'uncertain'),
+      uncertain: log.status === 'Uncertain',
+      desc: log.desc, remedy: log.remedy || ['Consult local agricultural extension service.']
+    };
+    switchDashView('detect');
+    displayResult();
+  }
+
+  /* ======================================================
+     GLOBAL SEARCH
+  ====================================================== */
+  function handleGlobalSearch(val) {
+    if (!val.trim()) return;
+    switchDashView('logs');
+    document.getElementById('flt-search').value = val;
+    applyLogsFilters();
+  }
+
+  /* ======================================================
+     SETTINGS TABS & ACTIONS
+  ====================================================== */
+  function switchSettingsTab(tab) {
+    document.querySelectorAll('.stab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.spanel').forEach(p => p.classList.remove('active'));
+    document.getElementById('stab-' + tab).classList.add('active');
+    document.getElementById('spanel-' + tab).classList.add('active');
+  }
+
+  function saveProfile() {
+    const fname = document.getElementById('set-fname').value.trim();
+    const lname = document.getElementById('set-lname').value.trim();
+    const role  = document.getElementById('set-role').value;
+    if (!fname) { showToast('error', '❌ First name cannot be empty.'); return; }
+    currentUser.firstName = fname;
+    currentUser.name = fname + ' ' + lname;
+    currentUser.role = role;
+    document.getElementById('dash-username').textContent = currentUser.name;
+    document.getElementById('dash-first-name').textContent = fname;
+    document.getElementById('dash-role').textContent = role;
+    document.getElementById('dash-avatar').textContent = fname[0].toUpperCase();
+    document.getElementById('settings-big-av').textContent = fname[0].toUpperCase();
+    showToast('success', '✅ Profile details updated!');
+  }
+
+  function selectLang(code) {
+    ['en','hi','bn'].forEach(c => {
+      document.getElementById('lopt-' + c).classList.toggle('sel', c === code);
+    });
+    const names = { en: 'English', hi: 'हिन्दी (Hindi)', bn: 'বাংলা (Bengali)' };
+    showToast('success', '🌐 Interface language set to ' + names[code]);
+  }
+
+  function clearAllLogs() {
+    if (confirm('Are you sure you want to delete all prediction logs? This cannot be undone.')) {
+      currentLogs = [];
+      renderLogsTable([]);
+      document.getElementById('logs-badge').textContent = '0';
+      document.getElementById('kpi-total').textContent = '0';
+      showToast('info', '🗑️ All prediction logs cleared.');
+    }
+  }
+
+  function deleteAccount() {
+    if (confirm('Permanently delete your account and all associated data?')) {
+      currentUser = null;
+      showPage('landing');
+      showToast('error', 'Account deleted. Thank you for using LeafGuard.');
+    }
+  }
+
+  /* ======================================================
+     FORGOT PASSWORD MODAL
+  ====================================================== */
+  function openForgot() { document.getElementById('forgot-modal').classList.add('open'); }
+  function closeForgot() {
+    document.getElementById('forgot-modal').classList.remove('open');
+    document.getElementById('forgot-email').value = '';
+    document.getElementById('forgot-err').classList.remove('show');
+  }
+  function closeForgotOnBg(e) { if (e.target === document.getElementById('forgot-modal')) closeForgot(); }
+  function handleForgot() {
+    const email = document.getElementById('forgot-email').value.trim();
+    const err = document.getElementById('forgot-err');
+    if (!isEmail(email)) { err.classList.add('show'); return; }
+    err.classList.remove('show');
+    closeForgot();
+    showToast('success', '📧 Reset link sent to ' + email);
+  }
+
+  function socialLogin(p) {
+    showToast('info', `🔗 ${p} OAuth integration requires backend configuration.`);
+  }
+
+  /* ======================================================
+     TOAST
+  ====================================================== */
+  function showToast(type, msg) {
+    const c = document.getElementById('toast-container');
+    const t = document.createElement('div');
+    t.className = 'toast ' + type;
+    t.textContent = msg;
+    c.appendChild(t);
+    setTimeout(() => {
+      t.style.opacity = '0'; t.style.transform = 'translateX(20px)';
+      t.style.transition = 'all .3s ease';
+      setTimeout(() => t.remove(), 300);
+    }, 3500);
+  }
+
+  /* ======================================================
+     KEYBOARD EVENTS
+  ====================================================== */
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      const p = document.querySelector('.page.active');
+      if (p && p.id === 'page-auth') {
+        const f = document.querySelector('.auth-form.active');
+        if (f && f.id === 'form-signin') handleSignIn();
+        if (f && f.id === 'form-signup') handleSignUp();
+      }
+    }
+    if (e.key === 'Escape') closeForgot();
+  });
+</script>
+</body>
+</html>
+
